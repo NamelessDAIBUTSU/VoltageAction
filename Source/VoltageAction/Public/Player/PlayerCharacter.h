@@ -64,4 +64,8 @@ private: /* コンポーネント */
 	// HP管理コンポーネント
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UHealthComponent> HPComp;
+
+	// 武器管理こぽーねんと
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UWeaponComponent> WeaponComp;
 };

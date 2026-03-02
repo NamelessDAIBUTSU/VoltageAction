@@ -8,6 +8,7 @@
 #include <ActorComponent/DodgeComponent.h>
 #include <ActorComponent/CombatComponent.h>
 #include <ActorComponent/HealthComponent.h>
+#include "ActorComponent/WeaponComponent.h"
 
 AWarriorMonster::AWarriorMonster()
 {

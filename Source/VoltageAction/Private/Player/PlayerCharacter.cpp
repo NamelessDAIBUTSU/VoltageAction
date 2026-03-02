@@ -9,6 +9,7 @@
 #include "ActorComponent/DodgeComponent.h"
 #include "ActorComponent/CombatComponent.h"
 #include "ActorComponent/HealthComponent.h"
+#include "ActorComponent/WeaponComponent.h"
 #include <Voltage/VoltageManager.h>
 
 // Sets default values
@@ -40,6 +41,7 @@ APlayerCharacter::APlayerCharacter()
 	DodgeComp = CreateDefaultSubobject<UDodgeComponent>(TEXT("Dodge"));
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat"));
 	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
+	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("Weapon"));
 }
 
 // Called when the game starts or when spawned
@@ -90,12 +92,14 @@ void APlayerCharacter::RotateCamera(FVector2D RotateVec)
 
 	if (RotateVec.X != 0.f)
 	{
-		float XRotateSpeed = RotateVec.X < 0.f ? CameraXRotateSpeed * -1.f : CameraXRotateSpeed;
+		//float XRotateSpeed = RotateVec.X < 0.f ? CameraXRotateSpeed * -1.f : CameraXRotateSpeed;
+		float XRotateSpeed = RotateVec.X * CameraXRotateSpeed;
 		AddControllerYawInput(XRotateSpeed);
 	}
 	if (RotateVec.Y != 0.f)
 	{
-		float YRotateSpeed = RotateVec.Y < 0.f ? CameraYRotateSpeed * -1.f : CameraYRotateSpeed;
+		//float YRotateSpeed = RotateVec.Y < 0.f ? CameraYRotateSpeed * -1.f : CameraYRotateSpeed;
+		float YRotateSpeed = RotateVec.Y * CameraYRotateSpeed;
 		AddControllerPitchInput(YRotateSpeed);
 	}
 }
