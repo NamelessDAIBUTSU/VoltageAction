@@ -50,7 +50,10 @@ void UHealthComponent::TakeAnyDamage(
 	CurrentHP -= Damage;
 
 	// HP更新デリゲートの発火
-	OnUpdateHPDelegate.Broadcast(CurrentHP, Damage);
+	FHPBarUpdateData UpdateData;
+	UpdateData.CurrentHP = CurrentHP;
+	UpdateData.MaxHP = MaxHP;
+	OnUpdateHPDelegate.Broadcast(UpdateData);
 
 	if (CurrentHP <= 0.f)
 	{

@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "UI/PlayerHPBarWidget.h"
 #include "HealthComponent.generated.h"
 
 // HP更新デリゲート
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateHPDelegate, float, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPDelegate, const FHPBarUpdateData&);
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VOLTAGEACTION_API UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -33,7 +34,7 @@ public:
 	// ダメージ受け処理
 	UFUNCTION()
 	void TakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
-		
+
 private:
 	// 死亡処理
 	void Die();
@@ -44,5 +45,8 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float CurrentHP = 10.f;
+	float MaxHP = 0.f;
+
+	UPROPERTY(VisibleAnywhere)
+	float CurrentHP = 0.f;
 };

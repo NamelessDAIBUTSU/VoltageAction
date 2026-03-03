@@ -6,9 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "MyPlayerController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class VOLTAGEACTION_API AMyPlayerController : public APlayerController
 {
@@ -34,13 +31,14 @@ public:
 	UFUNCTION()
 	void Dodge();
 
+private:
+	// UI初期化
+	void InitializeUI();
+
 public:
-	// 本体用入力コンテキスト
+	// 入力コンテキスト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	TObjectPtr<class UInputMappingContext> IMC_Body;
-	// アストラル用入力コンテキスト
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	TObjectPtr<class UInputMappingContext> IMC_Astral;
+	TObjectPtr<class UInputMappingContext> IMC_PlayerCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<class UInputAction> IA_Move;
@@ -48,4 +46,13 @@ public:
 	TObjectPtr<class UInputAction> IA_Dodge;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<class UInputAction> IA_Mouse;
+	
+private:
+	// HUDキャンバスクラス
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class UHUDCanvasWidget> HUDCanvasWidgetClass;
+
+	// UI管理用のManager
+	UPROPERTY()
+	TObjectPtr<class UUIManager> UIManager;
 };

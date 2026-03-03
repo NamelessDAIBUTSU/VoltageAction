@@ -5,6 +5,8 @@
 #include <Player/PlayerCharacter.h>
 #include "GameFramework/CharacterMovementComponent.h"
 #include <ActorComponent/DodgeComponent.h>
+#include <UI/UIManager.h>
+#include <UI/HUDCanvasWidget.h>
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -19,8 +21,11 @@ void AMyPlayerController::BeginPlay()
 		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->ClearAllMappings();
-		Subsystem->AddMappingContext(IMC_Body, 0);
+		Subsystem->AddMappingContext(IMC_PlayerCharacter, 0);
 	}
+
+	// UIの初期化
+	InitializeUI();
 }
 
 void AMyPlayerController::SetupInputComponent()
@@ -85,5 +90,34 @@ void AMyPlayerController::Dodge()
 	if (UDodgeComponent* DodgeComp = Body->FindComponentByClass<UDodgeComponent>())
 	{
 		DodgeComp->Dodge();
+	}
+}
+
+// UI初期化
+void AMyPlayerController::InitializeUI()
+{
+	// UIManagerの生成
+	UIManager = NewObject<UUIManager>(this, UUIManager::StaticClass());
+	if (UIManager == nullptr)
+		return;
+
+	// UIManagerの初期化
+	UIManager->Initialize();
+
+	// メインキャンバスの生成
+	if (HUDCanvasWidgetClass)
+	{
+		UHUDCanvasWidget* CanvasWidget = CreateWidget<UHUDCanvasWidget>(this, HUDCanvasWidgetClass);
+		if (CanvasWidget)
+		{
+			// 初期化
+			CanvasWidget->InitializeWidget();
+
+			// 表示
+			CanvasWidget->AddToViewport();
+
+			// マネージャー管理下に設定
+			UIManager->SetHUDCanvasWidget(CanvasWidget);
+		}
 	}
 }
