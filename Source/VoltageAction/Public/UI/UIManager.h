@@ -18,8 +18,11 @@ public:
 
 	void SetHUDCanvasWidget(UHUDCanvasWidget* CanvasWidget);
 
+	// HPバーの初期化
+	void InitializeHPBarWidget(class UHealthComponent* HPComp);
+
 private:
 	// HUDキャンバス
 	UPROPERTY()
-	TObjectPtr<UHUDCanvasWidget> HUDCanvasWidget;
+	TObjectPtr<UHUDCanvasWidget> HUDCanvasWidget = nullptr;
 };

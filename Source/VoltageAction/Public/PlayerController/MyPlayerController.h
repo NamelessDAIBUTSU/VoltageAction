@@ -16,6 +16,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	// プレイヤーが生成された後の初期化処理
+	virtual void OnPossess(APawn* aPawn) override;
+
 	// 入力バインド設定
 	virtual void SetupInputComponent() override;
 
@@ -34,6 +37,9 @@ public:
 private:
 	// UI初期化
 	void InitializeUI();
+
+	// HPバーの初期化を試みる
+	void TryHPBarInitialize(APawn* aPawn);
 
 public:
 	// 入力コンテキスト
@@ -54,5 +60,5 @@ private:
 
 	// UI管理用のManager
 	UPROPERTY()
-	TObjectPtr<class UUIManager> UIManager;
+	TObjectPtr<class UUIManager> UIManager = nullptr;
 };

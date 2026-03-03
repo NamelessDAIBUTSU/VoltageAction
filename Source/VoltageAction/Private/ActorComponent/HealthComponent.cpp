@@ -20,6 +20,9 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 現在のHPをMaxHPに設定
+	CurrentHP = MaxHP;
+
 	// ダメージ受けイベントをバインド
 	if (AActor* Owner = GetOwner())
 	{
@@ -28,6 +31,12 @@ void UHealthComponent::BeginPlay()
 			&UHealthComponent::TakeAnyDamage
 		);
 	}
+
+	// HPバー初期化用に更新デリゲートの発火
+	FHPBarUpdateData UpdateData;
+	UpdateData.CurrentHP = CurrentHP;
+	UpdateData.MaxHP = MaxHP;
+	OnUpdateHPDelegate.Broadcast(UpdateData);
 }
 
 
@@ -47,7 +56,8 @@ void UHealthComponent::TakeAnyDamage(
 	AController* InstigatedBy,
 	AActor* DamageCauser)
 {
-	CurrentHP -= Damage;
+	// ダメージ計算
+	CurrentHP = FMath::Clamp(CurrentHP - Damage, 0.f, CurrentHP);
 
 	// HP更新デリゲートの発火
 	FHPBarUpdateData UpdateData;
@@ -55,6 +65,7 @@ void UHealthComponent::TakeAnyDamage(
 	UpdateData.MaxHP = MaxHP;
 	OnUpdateHPDelegate.Broadcast(UpdateData);
 
+	// 死亡処理の呼び出し
 	if (CurrentHP <= 0.f)
 	{
 		Die();

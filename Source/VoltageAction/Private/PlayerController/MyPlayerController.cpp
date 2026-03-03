@@ -7,6 +7,7 @@
 #include <ActorComponent/DodgeComponent.h>
 #include <UI/UIManager.h>
 #include <UI/HUDCanvasWidget.h>
+#include <ActorComponent/HealthComponent.h>
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -23,9 +24,18 @@ void AMyPlayerController::BeginPlay()
 		Subsystem->ClearAllMappings();
 		Subsystem->AddMappingContext(IMC_PlayerCharacter, 0);
 	}
+}
+
+// プレイヤーが生成された後の初期化処理
+void AMyPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
 
 	// UIの初期化
 	InitializeUI();
+
+	// UIのHPバーの初期化を試みる
+	TryHPBarInitialize(aPawn);
 }
 
 void AMyPlayerController::SetupInputComponent()
@@ -118,6 +128,21 @@ void AMyPlayerController::InitializeUI()
 
 			// マネージャー管理下に設定
 			UIManager->SetHUDCanvasWidget(CanvasWidget);
+		}
+	}
+}
+
+// HPバーの初期化を試みる
+void AMyPlayerController::TryHPBarInitialize(APawn* aPawn)
+{
+	if (aPawn == nullptr || UIManager == nullptr)
+		return;
+
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(aPawn))
+	{
+		if (UHealthComponent* HPComp = PlayerCharacter->FindComponentByClass<UHealthComponent>())
+		{
+			UIManager->InitializeHPBarWidget(HPComp);
 		}
 	}
 }

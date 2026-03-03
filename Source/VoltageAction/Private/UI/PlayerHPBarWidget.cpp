@@ -7,11 +7,26 @@
 #include "Components/TextBlock.h"
 
 
+void UPlayerHPBarWidget::Initialize(UHealthComponent* HPComp)
+{
+	// イベントのバインド
+	BindEvent(HPComp);
+
+	// 初期のHPバーの状態を設定
+	FHPBarUpdateData InitialData;
+	InitialData.CurrentHP = HPComp ? HPComp->GetCurrentHP() : 0.f;
+	InitialData.MaxHP = HPComp ? HPComp->GetMaxHP() : 0.f;
+	UpdateHPBar(InitialData);
+}
+
 void UPlayerHPBarWidget::BindEvent(UHealthComponent* HPComp)
 {
-	// HP更新関数をバインド
 	if (HPComp)
 	{
+		// 多重バインド防止
+		HPComp->OnUpdateHPDelegate.RemoveAll(this);
+
+		// HP更新関数をバインド
 		HPComp->OnUpdateHPDelegate.AddUObject(this, &UPlayerHPBarWidget::UpdateHPBar);
 	}
 }
@@ -19,13 +34,20 @@ void UPlayerHPBarWidget::BindEvent(UHealthComponent* HPComp)
 // HPバーの更新
 void UPlayerHPBarWidget::UpdateHPBar(const FHPBarUpdateData& UpdateData)
 {
-	if (HPBar && NumeratorText && DenominatorText)
+	// HPの割合を計算してバーに反映
+	if (HPBar)
 	{
-		float HPPercent = UpdateData.CurrentHP / UpdateData.MaxHP;
-
+		float HPPercent = UpdateData.MaxHP > 0.f ? UpdateData.CurrentHP / UpdateData.MaxHP : 0.f;
 		HPBar->SetPercent(HPPercent);
+	}
 
+	// HPテキストを更新
+	if (NumeratorText)
+	{
 		NumeratorText->SetText(FText::AsNumber(FMath::RoundToInt(UpdateData.CurrentHP)));
+	}
+	if (DenominatorText)
+	{
 		DenominatorText->SetText(FText::AsNumber(FMath::RoundToInt(UpdateData.MaxHP)));
 	}
 }

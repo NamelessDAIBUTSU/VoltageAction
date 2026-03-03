@@ -10,7 +10,6 @@
 // HP更新デリゲート
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPDelegate, const FHPBarUpdateData&);
 
-
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VOLTAGEACTION_API UHealthComponent : public UActorComponent
 {
@@ -29,7 +28,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+	// HPの取得
 	float GetCurrentHP() const { return CurrentHP; }
+	float GetMaxHP() const { return MaxHP; }
 
 	// ダメージ受け処理
 	UFUNCTION()
@@ -44,9 +45,9 @@ public:
 	FOnUpdateHPDelegate OnUpdateHPDelegate;
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float MaxHP = 0.f;
-
 	UPROPERTY(VisibleAnywhere)
 	float CurrentHP = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MaxHP = 0.f;
 };

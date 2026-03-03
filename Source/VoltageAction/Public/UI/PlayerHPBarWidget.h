@@ -17,16 +17,20 @@ public:
 	float ChangedValue;
 };
 
+class UHealthComponent;
+
 UCLASS()
 class VOLTAGEACTION_API UPlayerHPBarWidget : public UWidgetBase
 {
 	GENERATED_BODY()
 	
 public:
-	// イベントのバインド
-	void BindEvent(class UHealthComponent* HPComp);
+	void Initialize(UHealthComponent* HPComp);
 
 private:
+	// イベントのバインド
+	void BindEvent(UHealthComponent* HPComp);
+
 	// HPバーの更新
 	void UpdateHPBar(const FHPBarUpdateData& UpdateData);
 

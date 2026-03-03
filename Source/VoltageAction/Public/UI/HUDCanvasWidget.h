@@ -20,10 +20,10 @@ public:
 public:
 	// 配置用キャンバス
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<class UCanvasPanel> MainCanvas;
+	TObjectPtr<class UCanvasPanel> MainCanvas = nullptr;
 
 public: /* 子ウィジェット */
 	// プレイヤーHPゲージ
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UPlayerHPBarWidget> WBP_PlayerHPBar;
+	TObjectPtr<class UPlayerHPBarWidget> WBP_PlayerHPBar = nullptr;
 };
