@@ -5,11 +5,14 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "VoltageDef.h"
+#include "UI/VoltageGaugeWidget.h"
 #include "VoltageManager.generated.h"
 
-/**
- * 
- */
+struct FGaugeUpdateData;
+
+// ボルテージ変更時のデリゲート
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnVoltageChangedDelegate, const FGaugeUpdateData&);
+
 UCLASS()
 class VOLTAGEACTION_API UVoltageManager : public UWorldSubsystem
 {
@@ -19,7 +22,7 @@ public:
 	UVoltageManager();
 
 public:
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override {}
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override {}
 
 public:
@@ -30,18 +33,25 @@ public:
 	float GetCurrentVoltage() const { return CurrentVoltage; }
 	void SetCurrentVoltage(float Voltage) { CurrentVoltage = Voltage; }
 
+	// 最大のボルテージ値
+	float GetMaxVoltage() const { return MaxVoltage; }
+
 	// ボルテージの増減処理
-	void AddVoltage(float Voltage) { CurrentVoltage += Voltage; }
-	void LostVoltage(float Voltage) { CurrentVoltage -= Voltage; }
+	void ChangeVoltage(float ChangedVoltage);
 
 	// 現在のボルテージランクを取得
 	EVoltageRank GetCurrentVoltageRank() const { return CurrentRank; }
 	void SetCurrentVoltageRank(EVoltageRank Rank) { CurrentRank = Rank; }
 
+public: /* コールバック */
 	// ジャスト回避によるボルテージ増加
-	void ApplyJustDodge();
+	void OnJustDodge();
 	// 被ダメージによるボルテージ減少
-	void ApplyTakeDamage();
+	void OnTakeDamage();
+
+public:
+	// ボルテージ変更時のデリゲート
+	FOnVoltageChangedDelegate OnVoltageChangedDelegate;
 
 private:
 	// 現在のボルテージ値
@@ -55,7 +65,7 @@ private:
 
 private: /* ボルテージ量の定義 */
 	// ジャスト回避
-	static constexpr float JustDodgeGainVoltage = 20.f;
+	static constexpr float JustDodgeGainVoltage = 15.f;
 	// 被ダメージ
-	static constexpr float TakeDamageLostVoltage = 10.f;
+	static constexpr float TakeDamageLostVoltage = -10.f;
 };

@@ -23,6 +23,8 @@ public:
 	void InitializePlayerHPBarWidget(UHealthComponent* HPComp);
 	// 敵HPバーの初期化
 	void InitializeEnemyHPBarWidget(UHealthComponent* HPComp);
+	// ボルテージゲージの初期化
+	void InitializeVoltageGaugeWidget(UHealthComponent* HPComp);
 
 private:
 	// HUDキャンバス

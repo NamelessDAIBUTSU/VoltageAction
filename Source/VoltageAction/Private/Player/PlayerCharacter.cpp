@@ -50,12 +50,28 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// イベントのバインド
-	// ジャスト回避
 	if (UVoltageManager* VoltageManager = GetWorld()->GetSubsystem<UVoltageManager>())
 	{
+		// イベント：ジャスト回避
 		if (DodgeComp)
 		{
-			DodgeComp->OnJustDodgeDelegate.AddUObject(VoltageManager, &UVoltageManager::ApplyJustDodge);
+			// ボルテージ増加
+			DodgeComp->OnJustDodgeDelegate.AddUObject(VoltageManager, &UVoltageManager::OnJustDodge);
+
+			// 無敵状態の開始
+			if (CombatComp)
+			{
+				DodgeComp->OnJustDodgeDelegate.AddUObject(CombatComp, &UCombatComponent::OnStartInvincible);
+			}
+		}
+
+		if (HPComp)
+		{
+			// イベント：被ダメージ
+			HPComp->OnDamagedDelegate.AddUObject(VoltageManager, &UVoltageManager::OnTakeDamage);
+
+			// イベント：死亡
+			//HPComp->OnDeathDelegate.AddUObject(, &::);
 		}
 	}
 }

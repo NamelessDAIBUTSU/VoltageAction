@@ -10,9 +10,7 @@
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	//PrimaryComponentTick.bCanEverTick = true;
 
 }
 
@@ -67,6 +65,10 @@ EAttackResult UCombatComponent::ReceiveAttack(const FAttackData& AttackData)
 	if (DamagedOwner == nullptr)
 		return EAttackResult::None;
 
+	// 無敵状態なら攻撃を無効化
+	if(bIsInvincible)
+		return EAttackResult::None;
+
 	// ジャスト回避判定
 	if (UDodgeComponent* DodgeComp = DamagedOwner->FindComponentByClass<UDodgeComponent>())
 	{
@@ -84,5 +86,39 @@ EAttackResult UCombatComponent::ReceiveAttack(const FAttackData& AttackData)
 
 	// 攻撃受信イベント発火
 	return EAttackResult::Hit;
+}
+
+// 無敵状態の開始
+void UCombatComponent::OnStartInvincible()
+{
+	// タイマーをクリア
+	GetWorld()->GetTimerManager().ClearTimer(InvincibleTimer);
+
+	// 無敵状態を開始
+	bIsInvincible = true;
+
+	// 無敵状態の終了をタイマーでセット
+	GetWorld()->GetTimerManager().SetTimer(
+		InvincibleTimer,
+		this,
+		&UCombatComponent::OnEndInvincible,
+		InvincibleSec,
+		false
+	);
+
+	// ログ表示
+	UE_LOG(LogTemp, Log, TEXT("Invincibility started for %f seconds."), InvincibleSec);
+}
+
+// 無敵状態の終了
+void UCombatComponent::OnEndInvincible()
+{
+	bIsInvincible = false;
+
+	// タイマーをクリア
+	GetWorld()->GetTimerManager().ClearTimer(InvincibleTimer);
+
+	// ログ表示
+	UE_LOG(LogTemp, Log, TEXT("Invincibility ended."));
 }
 

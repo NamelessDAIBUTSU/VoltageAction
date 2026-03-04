@@ -32,10 +32,7 @@ void AMyPlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	// UIの初期化
-	InitializeUI();
-
-	// UIのHPバーの初期化を試みる
-	TryHPBarInitialize(aPawn);
+	InitializeUI(aPawn);
 }
 
 void AMyPlayerController::SetupInputComponent()
@@ -84,9 +81,6 @@ void AMyPlayerController::RotateCamera(const FInputActionValue& Value)
 		return;
 
 	Body->RotateCamera(InputAxis);
-
-	// ログ
-	UE_LOG(LogTemp, Log, TEXT("Camera Rotated: %s"), *InputAxis.ToString());
 }
 
 void AMyPlayerController::Dodge()
@@ -103,9 +97,12 @@ void AMyPlayerController::Dodge()
 	}
 }
 
-// UI初期化
-void AMyPlayerController::InitializeUI()
+// プレイヤーが必要なUI初期化
+void AMyPlayerController::InitializeUI(APawn* aPawn)
 {
+	if (aPawn == nullptr)
+		return;
+
 	// UIManagerの生成
 	UIManager = NewObject<UUIManager>(this, UUIManager::StaticClass());
 	if (UIManager == nullptr)
@@ -115,25 +112,24 @@ void AMyPlayerController::InitializeUI()
 	UIManager->Initialize();
 
 	// メインキャンバスの生成
-	if (HUDCanvasWidgetClass)
-	{
-		UHUDCanvasWidget* CanvasWidget = CreateWidget<UHUDCanvasWidget>(this, HUDCanvasWidgetClass);
-		if (CanvasWidget)
-		{
-			// 初期化
-			CanvasWidget->InitializeWidget();
+	CreateHUDCanvasWidget();
 
-			// 表示
-			CanvasWidget->AddToViewport();
-
-			// マネージャー管理下に設定
-			UIManager->SetHUDCanvasWidget(CanvasWidget);
-		}
-	}
+	// プレイヤー情報が必要なUIの初期化
+	InitializeUIWithPlayer(aPawn);
 }
 
-// HPバーの初期化を試みる
-void AMyPlayerController::TryHPBarInitialize(APawn* aPawn)
+// プレイヤー情報が必要なUI初期化
+void AMyPlayerController::InitializeUIWithPlayer(APawn* aPawn)
+{
+	// HPバーの初期化
+	InitializeHPBarIWidget(aPawn);
+
+	// ボルテージゲージの初期化
+	InitializeVoltageGaugeWidget(aPawn);
+}
+
+// HPバーの初期化
+void AMyPlayerController::InitializeHPBarIWidget(APawn* aPawn)
 {
 	if (aPawn == nullptr || UIManager == nullptr)
 		return;
@@ -144,5 +140,39 @@ void AMyPlayerController::TryHPBarInitialize(APawn* aPawn)
 		{
 			UIManager->InitializePlayerHPBarWidget(HPComp);
 		}
+	}
+}
+// ボルテージゲージの初期化
+void AMyPlayerController::InitializeVoltageGaugeWidget(APawn* aPawn)
+{
+	if (aPawn == nullptr || UIManager == nullptr)
+		return;
+
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(aPawn))
+	{
+		if (UHealthComponent* HPComp = PlayerCharacter->FindComponentByClass<UHealthComponent>())
+		{
+			UIManager->InitializeVoltageGaugeWidget(HPComp);
+		}
+	}
+}
+
+// メインキャンバスの生成
+void AMyPlayerController::CreateHUDCanvasWidget()
+{
+	if (UIManager == nullptr || HUDCanvasWidgetClass == nullptr)
+		return;
+
+	UHUDCanvasWidget* CanvasWidget = CreateWidget<UHUDCanvasWidget>(this, HUDCanvasWidgetClass);
+	if (CanvasWidget)
+	{
+		// 初期化
+		CanvasWidget->InitializeWidget();
+
+		// 表示
+		CanvasWidget->AddToViewport();
+
+		// マネージャー管理下に設定
+		UIManager->SetHUDCanvasWidget(CanvasWidget);
 	}
 }

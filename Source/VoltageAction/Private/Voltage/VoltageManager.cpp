@@ -2,9 +2,17 @@
 
 
 #include "Voltage/VoltageManager.h"
+#include "UI/VoltageGaugeWidget.h"
 
 UVoltageManager::UVoltageManager()
 {
+}
+
+void UVoltageManager::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+
+    // 
 }
 
 EVoltageRank UVoltageManager::ConvertVoltageToRank(float Voltage)
@@ -27,13 +35,23 @@ EVoltageRank UVoltageManager::ConvertVoltageToRank(float Voltage)
     }
 }
 
-// ジャスト回避によるボルテージ増加
-void UVoltageManager::ApplyJustDodge()
+// ボルテージの増減処理
+void UVoltageManager::ChangeVoltage(float ChangedVoltage)
 {
-    AddVoltage(JustDodgeGainVoltage); 
+    CurrentVoltage = FMath::Clamp(CurrentVoltage + ChangedVoltage, 0.f, MaxVoltage);
+
+	// ボルテージゲージウィジェットに更新通知
+    FGaugeUpdateData UpdateData(CurrentVoltage, MaxVoltage, ChangedVoltage);
+    OnVoltageChangedDelegate.Broadcast(UpdateData);
 }
 
-void UVoltageManager::ApplyTakeDamage()
+// ジャスト回避によるボルテージ増加通知
+void UVoltageManager::OnJustDodge()
 {
-    LostVoltage(TakeDamageLostVoltage);
+    ChangeVoltage(JustDodgeGainVoltage); 
+}
+// 被ダメージによるボルテージ減少通知
+void UVoltageManager::OnTakeDamage()
+{
+    ChangeVoltage(TakeDamageLostVoltage);
 }

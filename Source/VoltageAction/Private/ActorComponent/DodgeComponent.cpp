@@ -9,11 +9,7 @@
 // Sets default values for this component's properties
 UDodgeComponent::UDodgeComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	//PrimaryComponentTick.bCanEverTick = true;
 }
 
 
@@ -32,7 +28,6 @@ void UDodgeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
 }
 
 // 回避行動
@@ -65,14 +60,11 @@ void UDodgeComponent::Dodge()
 // ジャスト回避を通知
 void UDodgeComponent::ApplyJustDodge()
 {
-	// デリゲートにバインドしたイベントを発火
+	// ジャスト回避成功イベントを発火
 	OnJustDodgeDelegate.Broadcast();
 
-	UVoltageManager* VoltageManager = GetWorld()->GetSubsystem<UVoltageManager>();
-	if (VoltageManager == nullptr)
-		return;
-
-	VoltageManager->ApplyJustDodge();
+	// ジャスト回避判定を終了
+	JustDodgeEndTime = 0.f;
 }
 
 // 回避中か
@@ -100,11 +92,11 @@ bool UDodgeComponent::IsJustDodging()
 void UDodgeComponent::StartInvincible()
 {
 	// 無敵時間の終了時刻を設定
-	InvincibleEndTime = GetWorld()->GetTimeSeconds() + InvincibleDuration;
+	JustDodgeEndTime = GetWorld()->GetTimeSeconds() + JustDodgeSec;
 }
 
 // 無敵時間終了時刻の取得
 float UDodgeComponent::GetInvincibleEndTime() const
 {
-	return InvincibleEndTime; 
+	return JustDodgeEndTime;
 }

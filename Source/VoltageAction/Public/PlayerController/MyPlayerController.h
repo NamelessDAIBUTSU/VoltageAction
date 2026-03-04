@@ -41,10 +41,16 @@ public:
 
 private:
 	// UI初期化
-	void InitializeUI();
+	void InitializeUI(APawn* aPawn);
+	// プレイヤー情報が必要なUI初期化
+	void InitializeUIWithPlayer(APawn* aPawn);
+	// HPバーの初期化
+	void InitializeHPBarIWidget(APawn* aPawn);
+	// ボルテージゲージの初期化
+	void InitializeVoltageGaugeWidget(APawn* aPawn);
 
-	// HPバーの初期化を試みる
-	void TryHPBarInitialize(APawn* aPawn);
+	// メインキャンバスの生成
+	void CreateHUDCanvasWidget();
 
 public:
 	// 入力コンテキスト

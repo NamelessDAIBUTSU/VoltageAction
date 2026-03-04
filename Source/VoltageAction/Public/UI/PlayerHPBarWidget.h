@@ -6,18 +6,8 @@
 #include "UI/WidgetBase.h"
 #include "PlayerHPBarWidget.generated.h"
 
-USTRUCT()
-struct FHPBarUpdateData
-{
-	GENERATED_BODY()
-
-public:
-	float CurrentHP;
-	float MaxHP;
-	float ChangedValue;
-};
-
 class UHealthComponent;
+struct FGaugeUpdateData;
 
 UCLASS()
 class VOLTAGEACTION_API UPlayerHPBarWidget : public UWidgetBase
@@ -32,7 +22,7 @@ private:
 	void BindEvent(UHealthComponent* HPComp);
 
 	// HPバーの更新
-	void UpdateHPBar(const FHPBarUpdateData& UpdateData);
+	void UpdateHPBar(const FGaugeUpdateData& UpdateData);
 
 private:
 	UPROPERTY(meta = (BindWidget))

@@ -3,15 +3,12 @@
 
 #include "ActorComponent/HealthComponent.h"
 #include "GameFramework/Character.h"
+#include "UI/VoltageGaugeWidget.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	//PrimaryComponentTick.bCanEverTick = true;
 }
 
 
@@ -26,6 +23,7 @@ void UHealthComponent::BeginPlay()
 	// ダメージ受けイベントをバインド
 	if (AActor* Owner = GetOwner())
 	{
+		// ダメージ処理
 		Owner->OnTakeAnyDamage.AddDynamic(
 			this,
 			&UHealthComponent::TakeAnyDamage
@@ -33,9 +31,7 @@ void UHealthComponent::BeginPlay()
 	}
 
 	// HPバー初期化用に更新デリゲートの発火
-	FHPBarUpdateData UpdateData;
-	UpdateData.CurrentHP = CurrentHP;
-	UpdateData.MaxHP = MaxHP;
+	FGaugeUpdateData UpdateData(CurrentHP, MaxHP, 0.f);
 	OnUpdateHPDelegate.Broadcast(UpdateData);
 }
 
@@ -45,7 +41,6 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
 }
 
 // ダメージ受け処理
@@ -59,14 +54,15 @@ void UHealthComponent::TakeAnyDamage(
 	// ダメージ計算
 	CurrentHP = FMath::Clamp(CurrentHP - Damage, 0.f, CurrentHP);
 
-	// HP更新デリゲートの発火
-	FHPBarUpdateData UpdateData;
-	UpdateData.CurrentHP = CurrentHP;
-	UpdateData.MaxHP = MaxHP;
+	// 被ダメージ時デリゲートの発火（原因イベント）
+	OnDamagedDelegate.Broadcast();
+
+	// HP更新デリゲートの発火（結果イベント）
+	FGaugeUpdateData UpdateData(CurrentHP, MaxHP, 0.f);
 	OnUpdateHPDelegate.Broadcast(UpdateData);
 
 	// 死亡処理の呼び出し
-	if (CurrentHP <= 0.f)
+	if (IsDead())
 	{
 		Die();
 	}
@@ -75,6 +71,10 @@ void UHealthComponent::TakeAnyDamage(
 // 死亡処理
 void UHealthComponent::Die()
 {
+	// 死亡時デリゲートの発火
+	OnDieDelegate.Broadcast();
+
+	// アクターの削除
 	if (AActor* Owner = GetOwner())
 	{
 		Owner->Destroy();

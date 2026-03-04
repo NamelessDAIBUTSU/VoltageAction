@@ -30,4 +30,8 @@ public: /* 子ウィジェット */
 	// エネミーHPゲージ
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UEnemyHPBarWidget> WBP_EnemyHPBar = nullptr;
+
+	// ボルテージゲージ
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UVoltageGaugeWidget> WBP_VoltageGauge = nullptr;
 };

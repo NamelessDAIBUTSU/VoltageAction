@@ -7,7 +7,7 @@
 #include "EnemyHPBarWidget.generated.h"
 
 class UHealthComponent;
-struct FHPBarUpdateData;
+struct FGaugeUpdateData;
 
 UCLASS()
 class VOLTAGEACTION_API UEnemyHPBarWidget : public UWidgetBase
@@ -22,7 +22,7 @@ private:
 	void BindEvent(UHealthComponent* HPComp);
 
 	// HPバーの更新
-	void UpdateHPBar(const FHPBarUpdateData& UpdateData);
+	void UpdateHPBar(const FGaugeUpdateData& UpdateData);
 
 private:
 	UPROPERTY(meta = (BindWidget))

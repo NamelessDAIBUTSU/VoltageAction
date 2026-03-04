@@ -54,10 +54,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DodgeMontage;
 
-	// 無敵時間
+	// ジャスト回避の成功判定時間
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float InvincibleDuration = 0.15f;
+	float JustDodgeSec = 0.15f;
 
-	// 無敵状態終了時間
-	float InvincibleEndTime = 0.f;
+	// ジャスト回避状態終了時間
+	float JustDodgeEndTime = 0.f;
 };
