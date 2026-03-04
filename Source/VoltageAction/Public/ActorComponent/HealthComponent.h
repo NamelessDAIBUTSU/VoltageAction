@@ -41,7 +41,7 @@ private:
 	void Die();
 
 public:
-	// HP更新デリゲート
+	// プレイヤーHP更新デリゲート
 	FOnUpdateHPDelegate OnUpdateHPDelegate;
 
 private:

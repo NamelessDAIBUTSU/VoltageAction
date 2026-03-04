@@ -26,4 +26,8 @@ public: /* 子ウィジェット */
 	// プレイヤーHPゲージ
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPlayerHPBarWidget> WBP_PlayerHPBar = nullptr;
+
+	// エネミーHPゲージ
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UEnemyHPBarWidget> WBP_EnemyHPBar = nullptr;
 };

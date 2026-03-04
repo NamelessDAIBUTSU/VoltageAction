@@ -7,6 +7,7 @@
 #include "UIManager.generated.h"
 
 class UHUDCanvasWidget;
+class UHealthComponent;
 
 UCLASS()
 class VOLTAGEACTION_API UUIManager : public UObject
@@ -19,7 +20,9 @@ public:
 	void SetHUDCanvasWidget(UHUDCanvasWidget* CanvasWidget);
 
 	// HPバーの初期化
-	void InitializeHPBarWidget(class UHealthComponent* HPComp);
+	void InitializePlayerHPBarWidget(UHealthComponent* HPComp);
+	// 敵HPバーの初期化
+	void InitializeEnemyHPBarWidget(UHealthComponent* HPComp);
 
 private:
 	// HUDキャンバス

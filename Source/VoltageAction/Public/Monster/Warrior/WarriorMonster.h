@@ -41,14 +41,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UBoxComponent> AttackCollision;
 
-	// 戦闘コンポーネント
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UCombatComponent> CombatComp;
-
-	// HP管理コンポーネント
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UHealthComponent> HPComp;
-
 	// 槍攻撃のダメージ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	float AttackDamage = 10.0f;

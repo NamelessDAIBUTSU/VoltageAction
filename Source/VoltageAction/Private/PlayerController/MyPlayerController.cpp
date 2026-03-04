@@ -142,7 +142,7 @@ void AMyPlayerController::TryHPBarInitialize(APawn* aPawn)
 	{
 		if (UHealthComponent* HPComp = PlayerCharacter->FindComponentByClass<UHealthComponent>())
 		{
-			UIManager->InitializeHPBarWidget(HPComp);
+			UIManager->InitializePlayerHPBarWidget(HPComp);
 		}
 	}
 }

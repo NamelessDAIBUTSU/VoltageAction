@@ -20,4 +20,16 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	// 敵HPバーウィジェットの初期化
+	void InitializeEnemyHPBarWidget();
+
+protected:
+	// 戦闘コンポーネント
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UCombatComponent> CombatComp;
+
+	// HP管理コンポーネント
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UHealthComponent> HPComp;
 };

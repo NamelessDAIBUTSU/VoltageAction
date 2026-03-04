@@ -7,7 +7,6 @@
 #include <Components/BoxComponent.h>
 #include <ActorComponent/DodgeComponent.h>
 #include <ActorComponent/CombatComponent.h>
-#include <ActorComponent/HealthComponent.h>
 #include "ActorComponent/WeaponComponent.h"
 
 AWarriorMonster::AWarriorMonster()
@@ -16,10 +15,6 @@ AWarriorMonster::AWarriorMonster()
 
 	AttackCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollision"));
 	AttackCollision->SetupAttachment(SpearMesh);
-
-	// 戦闘コンポーネントとHPコンポーネントの作成
-	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 }
 
 void AWarriorMonster::OnConstruction(const FTransform& Transform)

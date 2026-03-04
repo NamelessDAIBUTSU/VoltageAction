@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "MyPlayerController.generated.h"
 
+class UUIManager;
+
 UCLASS()
 class VOLTAGEACTION_API AMyPlayerController : public APlayerController
 {
@@ -34,6 +36,9 @@ public:
 	UFUNCTION()
 	void Dodge();
 
+	// UIManagerの取得
+	UUIManager* GetUIManager() const { return UIManager; }
+
 private:
 	// UI初期化
 	void InitializeUI();
@@ -60,5 +65,5 @@ private:
 
 	// UI管理用のManager
 	UPROPERTY()
-	TObjectPtr<class UUIManager> UIManager = nullptr;
+	TObjectPtr<UUIManager> UIManager = nullptr;
 };
