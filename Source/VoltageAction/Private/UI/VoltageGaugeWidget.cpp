@@ -6,6 +6,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include <ActorComponent/HealthComponent.h>
+#include "Voltage/VoltageDef.h"
 
 void UVoltageGaugeWidget::NativeConstruct()
 {
@@ -47,11 +48,18 @@ void UVoltageGaugeWidget::UpdateVoltageGaugeImpl(const FGaugeUpdateData& UpdateD
 	// ボルテージテキストを更新
 	if (NumeratorText)
 	{
-		NumeratorText->SetText(FText::AsNumber(FMath::RoundToInt(UpdateData.CurrentValue)));
+		NumeratorText->SetText(FText::AsNumber(FMath::FloorToInt(UpdateData.CurrentValue)));
 	}
 	if (DenominatorText)
 	{
-		DenominatorText->SetText(FText::AsNumber(FMath::RoundToInt(UpdateData.MaxValue)));
+		DenominatorText->SetText(FText::AsNumber(FMath::FloorToInt(UpdateData.MaxValue)));
+	}
+
+	// ボルテージランクテキスト
+	if (VoltageRankText)
+	{
+		FString Name = StaticEnum<EVoltageRank>()->GetNameStringByValue((int8)UpdateData.VoltageRank);
+		VoltageRankText->SetText(FText::FromString(Name));
 	}
 }
 

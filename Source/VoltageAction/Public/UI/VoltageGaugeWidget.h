@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UI/WidgetBase.h"
+#include "Voltage/VoltageDef.h"
 #include "VoltageGaugeWidget.generated.h"
 
 // ゲージ更新デリゲート用構造体
@@ -18,11 +19,15 @@ public:
 	FGaugeUpdateData(float CurrentVal, float MaxVal, float ChangedVal)
 		: CurrentValue(CurrentVal), MaxValue(MaxVal), ChangedValue(ChangedVal) {
 	}
+	FGaugeUpdateData(float CurrentVal, float MaxVal, float ChangedVal, EVoltageRank Rank)
+		: CurrentValue(CurrentVal), MaxValue(MaxVal), ChangedValue(ChangedVal), VoltageRank(Rank) {
+	}
 
 public:
 	float CurrentValue = 0.f;
 	float MaxValue = 0.f;
 	float ChangedValue = 0.f;
+	EVoltageRank VoltageRank = EVoltageRank::Rank1;
 };
 
 class UHealthComponent;
@@ -59,4 +64,8 @@ private:
 	// 分子テキスト
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* NumeratorText;
+
+	// ボルテージランクテキスト
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* VoltageRankText;
 };

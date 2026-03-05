@@ -6,15 +6,18 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "VoltageDef.h"
 #include "UI/VoltageGaugeWidget.h"
+#include "VoltageParamTable.h"
 #include "VoltageManager.generated.h"
 
 struct FGaugeUpdateData;
 
 // ボルテージ変更時のデリゲート
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnVoltageChangedDelegate, const FGaugeUpdateData&);
+// ボルテージランク最大に達したときのデリゲート
+DECLARE_MULTICAST_DELEGATE(FOnVoltageMaxRankDelegate);
 
 UCLASS()
-class VOLTAGEACTION_API UVoltageManager : public UWorldSubsystem
+class VOLTAGEACTION_API UVoltageManager : public UWorldSubsystem, public FTickableGameObject
 {
 	GENERATED_BODY()
 
@@ -24,6 +27,11 @@ public:
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override {}
+
+public: /* FTickableGameObject */
+	virtual void Tick(float DeltaTime) override;
+	virtual TStatId GetStatId() const override;
+	virtual bool IsTickable() const override;
 
 public:
 	// ボルテージ値 → ボルテージランク変換処理
@@ -43,29 +51,43 @@ public:
 	EVoltageRank GetCurrentVoltageRank() const { return CurrentRank; }
 	void SetCurrentVoltageRank(EVoltageRank Rank) { CurrentRank = Rank; }
 
+	// 現在最高ランクか
+	bool IsMaxRank() const { return CurrentRank == EVoltageRank::MaxRank; }
+
 public: /* コールバック */
 	// ジャスト回避によるボルテージ増加
 	void OnJustDodge();
 	// 被ダメージによるボルテージ減少
 	void OnTakeDamage();
 
-public:
+private:
+	// 最高ランクの維持状態の処理
+	bool UpdateMaxRankMaintain(float DeltaTime);
+
+	// 毎フレームのボルテージ減少処理
+	void UpdateLostVoltage(float DeltaTime);
+
+	// 最大ランクの維持を開始
+	void StartMaxRankMaintain();
+
+public: /* デリゲート */
 	// ボルテージ変更時のデリゲート
 	FOnVoltageChangedDelegate OnVoltageChangedDelegate;
+	// ボルテージランク最大に達したときのデリゲート
+	FOnVoltageMaxRankDelegate OnVoltageMaxRankDelegate;
 
 private:
+	// ボルテージパラメータテーブル
+	TObjectPtr<UVoltageParamTable> VoltageParamTable;
+
 	// 現在のボルテージ値
 	float CurrentVoltage = 0.f;
 	// 最大のボルテージ値
 	float MaxVoltage = 100.f;
 
 	// 現在のボルテージランク
-	EVoltageRank CurrentRank = EVoltageRank::Rank0;
+	EVoltageRank CurrentRank = EVoltageRank::Rank1;
 
-
-private: /* ボルテージ量の定義 */
-	// ジャスト回避
-	static constexpr float JustDodgeGainVoltage = 15.f;
-	// 被ダメージ
-	static constexpr float TakeDamageLostVoltage = -10.f;
+	// 最高ランクの経過時間
+	float ElapsedMaxRankMaintainSec = 0.f;
 };
