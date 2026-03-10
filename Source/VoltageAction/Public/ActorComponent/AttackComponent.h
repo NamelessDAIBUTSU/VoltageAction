@@ -36,6 +36,9 @@ public:
 	// 攻撃中か
 	bool IsAttacking() const { return bIsAttacking; }
 
+	// コンボ継続可能フラグの設定
+	void SetCanCombo(bool Flag) { bCanCombo = Flag; }
+
 private:
 	// 現在の攻撃データを取得
 	class UAttackDataAsset* GetCurrentAttackData() const;
@@ -47,6 +50,9 @@ private:
 	UFUNCTION()
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	// 現在コンボの最終攻撃か
+	bool IsFinalAttackInCurrentCombo();
+
 private:
 	// 現在のコンボデータ
 	UPROPERTY(VisibleAnywhere)
@@ -56,7 +62,7 @@ private:
 	int32 CurrentComboIndex = 0;
 
 	// コンボ継続可能時間か
-	bool bCanNextCombo = false;
+	bool bCanCombo = false;
 
 	// 攻撃中か
 	bool bIsAttacking = false;
