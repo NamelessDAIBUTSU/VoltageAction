@@ -28,11 +28,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	// 回避行動
-	void Dodge();
+	// 回避アクション
+	void TryDodge();
 
-	// ジャスト回避を通知
-	void ApplyJustDodge();
+	// ジャスト回避成功を通知
+	void OnJustDodgeSuccess();
 
 	// 回避中か
 	bool IsDodging();

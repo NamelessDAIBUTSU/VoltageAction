@@ -33,9 +33,12 @@ public: /* IAttackReceiver */
 	// 攻撃を受信
 	virtual EAttackResult ReceiveAttack(const FAttackData& AttackData) override;
 
-public:
+public: /* 入力によるアクション */
+	// 移動
+	void TryMove(const FInputActionValue& Value);
+
 	// カメラ回転
-	void RotateCamera(FVector2D RotateVec);
+	void RotateCamera(const FInputActionValue& Value);
 
 public: /* カメラ */
 	// マウスによるカメラ回転スピード
@@ -57,15 +60,28 @@ private: /* コンポーネント */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UDodgeComponent> DodgeComp;
 
-	// 戦闘コンポーネント
+	// 戦闘仲介コンポーネント
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCombatComponent> CombatComp;
+
+	// 攻撃コンポーネント
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAttackComponent> AttackComp;
+
+	// パリィコンポーネント
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UParryComponent> ParryComp;
 
 	// HP管理コンポーネント
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UHealthComponent> HPComp;
 
-	// 武器管理こぽーねんと
+	// 装備管理コンポーネント
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UWeaponComponent> WeaponComp;
+
+private:
+	// 生成する武器アクタのクラス
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AWeaponActorBase> WeaponActorClass;
 };

@@ -8,6 +8,11 @@
 #include <UI/UIManager.h>
 #include <UI/HUDCanvasWidget.h>
 #include <ActorComponent/HealthComponent.h>
+#include <ActorComponent/CombatComponent.h>
+#include <ActorComponent/AttackComponent.h>
+#include <ActorComponent/ParryComponent.h>
+#include <ActorComponent/WeaponComponent.h>
+#include <Weapon/WeaponActorBase.h>
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -45,56 +50,119 @@ void AMyPlayerController::SetupInputComponent()
 		EIC->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AMyPlayerController::Move);
 		EIC->BindAction(IA_Mouse, ETriggerEvent::Triggered, this, &AMyPlayerController::RotateCamera);
 		EIC->BindAction(IA_Dodge, ETriggerEvent::Started, this, &AMyPlayerController::Dodge);
+		EIC->BindAction(IA_LightAttack, ETriggerEvent::Started, this, &AMyPlayerController::LightAttack);
+		EIC->BindAction(IA_HeavyAttack, ETriggerEvent::Started, this, &AMyPlayerController::HeavyAttack);
+		EIC->BindAction(IA_Parry, ETriggerEvent::Started, this, &AMyPlayerController::Parry);
 	}
 }
 
 void AMyPlayerController::Move(const FInputActionValue& Value)
 {
-	// Possessしているキャラクターを取得
-	ACharacter* PossessCharacter = Cast<ACharacter>(GetPawn());
-	if (PossessCharacter == nullptr)
+	// プレイヤーの取得
+	APlayerCharacter* PlayerCharacter = GetPlayerCharacter();
+	if (PlayerCharacter == nullptr)
 		return;
 
-	const FVector2D InputAxis = Value.Get<FVector2D>();
-
-	// カメラ軸で移動
-	// カメラの取得
-	FRotator CameraRot = GetControlRotation();
-	// カメラの回転から前方向と右方向を計算
-	FRotationMatrix CameraRotMat(CameraRot);
-	FVector Forward = CameraRotMat.GetUnitAxis(EAxis::X);
-	FVector Right = CameraRotMat.GetUnitAxis(EAxis::Y);
-
-	PossessCharacter->AddMovementInput(Forward, InputAxis.X);
-	PossessCharacter->AddMovementInput(Right, InputAxis.Y);
+	// 移動を試す
+	PlayerCharacter->TryMove(Value);
 }
 
 // カメラ回転
 void AMyPlayerController::RotateCamera(const FInputActionValue& Value)
 {
-	const FVector2D InputAxis = Value.Get<FVector2D>();
-	if (InputAxis.IsZero())
+	APlayerCharacter* PlayerCharacter = GetPlayerCharacter();
+	if (PlayerCharacter == nullptr)
 		return;
 
-	APlayerCharacter* Body = Cast<APlayerCharacter>(GetPawn());
-	if (Body == nullptr)
-		return;
-
-	Body->RotateCamera(InputAxis);
+	// カメラ回転処理
+	PlayerCharacter->RotateCamera(Value);
 }
 
 void AMyPlayerController::Dodge()
 {
-	// 本体の取得
-	APlayerCharacter* Body = Cast<APlayerCharacter>(GetPawn());
-	if (Body == nullptr)
+	// プレイヤーの取得
+	APlayerCharacter* PlayerCharacter = GetPlayerCharacter();
+	if (PlayerCharacter == nullptr)
 		return;
 
-	// 回避アクション
-	if (UDodgeComponent* DodgeComp = Body->FindComponentByClass<UDodgeComponent>())
+	// 回避アクションを試す
+	if (UDodgeComponent* DodgeComp = PlayerCharacter->FindComponentByClass<UDodgeComponent>())
 	{
-		DodgeComp->Dodge();
+		DodgeComp->TryDodge();
 	}
+}
+
+void AMyPlayerController::LightAttack()
+{
+	// プレイヤーの取得
+	APlayerCharacter* PlayerCharacter = GetPlayerCharacter();
+	if (PlayerCharacter == nullptr)
+		return;
+
+	// 攻撃用のコンポーネントを取得
+	UAttackComponent* AttackComp = PlayerCharacter->FindComponentByClass<UAttackComponent>();
+	if (AttackComp == nullptr)
+		return;
+
+	// 武器コンポーネントから武器の取得
+	if (UWeaponComponent* WeaponComp = PlayerCharacter->FindComponentByClass<UWeaponComponent>())
+	{
+		if (AWeaponActorBase* Weapon = WeaponComp->GetWeapon())
+		{
+			// 弱攻撃コンボデータを取得
+			UComboDataAsset* LightComboData = Weapon->GetLightComboData();
+
+			// 攻撃を試みる
+			AttackComp->TryAttack(LightComboData);
+		}
+	}
+}
+
+void AMyPlayerController::HeavyAttack()
+{
+	// プレイヤーの取得
+	APlayerCharacter* PlayerCharacter = GetPlayerCharacter();
+	if (PlayerCharacter == nullptr)
+		return;
+
+	// 攻撃用のコンポーネントを取得
+	UAttackComponent* AttackComp = PlayerCharacter->FindComponentByClass<UAttackComponent>();
+	if (AttackComp == nullptr)
+		return;
+
+
+	// 武器コンポーネントから武器の取得
+	if (UWeaponComponent* WeaponComp = PlayerCharacter->FindComponentByClass<UWeaponComponent>())
+	{
+		if (AWeaponActorBase* Weapon = WeaponComp->GetWeapon())
+		{
+			// 強攻撃コンボデータを取得
+			UComboDataAsset* HeavyComboData = Weapon->GetHeavyComboData();
+			
+			// 攻撃を試みる
+			AttackComp->TryAttack(HeavyComboData);
+		}
+	}
+}
+
+void AMyPlayerController::Parry()
+{
+	// プレイヤーの取得
+	APlayerCharacter* PlayerCharacter = GetPlayerCharacter();
+	if (PlayerCharacter == nullptr)
+		return;
+
+	// パリィアクション
+	if (UParryComponent* ParryComp = PlayerCharacter->FindComponentByClass<UParryComponent>())
+	{
+		ParryComp->TryParry();
+	}
+}
+
+APlayerCharacter* AMyPlayerController::GetPlayerCharacter() const
+{
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
+	return PlayerCharacter;
 }
 
 // プレイヤーが必要なUI初期化
@@ -134,12 +202,14 @@ void AMyPlayerController::InitializeHPBarIWidget(APawn* aPawn)
 	if (aPawn == nullptr || UIManager == nullptr)
 		return;
 
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(aPawn))
+	// プレイヤーの取得
+	APlayerCharacter* PlayerCharacter = GetPlayerCharacter();
+	if (PlayerCharacter == nullptr)
+		return;
+
+	if (UHealthComponent* HPComp = PlayerCharacter->FindComponentByClass<UHealthComponent>())
 	{
-		if (UHealthComponent* HPComp = PlayerCharacter->FindComponentByClass<UHealthComponent>())
-		{
-			UIManager->InitializePlayerHPBarWidget(HPComp);
-		}
+		UIManager->InitializePlayerHPBarWidget(HPComp);
 	}
 }
 // ボルテージゲージの初期化
@@ -148,12 +218,14 @@ void AMyPlayerController::InitializeVoltageGaugeWidget(APawn* aPawn)
 	if (aPawn == nullptr || UIManager == nullptr)
 		return;
 
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(aPawn))
+	// プレイヤーの取得
+	APlayerCharacter* PlayerCharacter = GetPlayerCharacter();
+	if (PlayerCharacter == nullptr)
+		return;
+
+	if (UHealthComponent* HPComp = PlayerCharacter->FindComponentByClass<UHealthComponent>())
 	{
-		if (UHealthComponent* HPComp = PlayerCharacter->FindComponentByClass<UHealthComponent>())
-		{
-			UIManager->InitializeVoltageGaugeWidget(HPComp);
-		}
+		UIManager->InitializeVoltageGaugeWidget(HPComp);
 	}
 }
 

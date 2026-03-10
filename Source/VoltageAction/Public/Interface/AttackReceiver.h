@@ -13,15 +13,11 @@ struct FAttackData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY()
 	float Damage = 0.f;
-
-	UPROPERTY()
 	float Knockback = 0.f;
-
-	// 攻撃をしてきたキャラクター
+	// 攻撃されたアクター
 	UPROPERTY()
-	TWeakObjectPtr<AActor> Instigator = nullptr;
+	TWeakObjectPtr<AActor> DamagedActor = nullptr;
 };
 
 // 攻撃結果
@@ -36,6 +32,7 @@ enum class EAttackResult : uint8
 };
 
 // 攻撃を受信するためのインターフェース
+// #MEMO : 受信だけするアクターが存在するかもしれないため用意
 UINTERFACE(MinimalAPI)
 class UAttackReceiver : public UInterface
 {

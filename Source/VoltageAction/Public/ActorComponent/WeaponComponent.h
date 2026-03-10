@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Weapon/WeaponActorBase.h"
 #include "WeaponComponent.generated.h"
 
 /// <summary>
@@ -26,7 +27,12 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+public:
+	// 武器の取得
+	AWeaponActorBase* GetWeapon() const { return EquippedWeapon; }
+	void SetWeapon(AWeaponActorBase* NewWeapon) { EquippedWeapon = NewWeapon; }
+
 private:
-	UPROPERTY()
-	TWeakObjectPtr<class AWeaponActorBase> EquippedWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<AWeaponActorBase> EquippedWeapon;
 };

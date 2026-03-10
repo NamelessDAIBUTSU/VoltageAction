@@ -31,7 +31,7 @@ void UDodgeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 }
 
 // 回避行動
-void UDodgeComponent::Dodge()
+void UDodgeComponent::TryDodge()
 {
 	APlayerCharacter* Owner = Cast<APlayerCharacter>(GetOwner());
 	if (Owner == nullptr)
@@ -48,17 +48,14 @@ void UDodgeComponent::Dodge()
 		return;
 
 	// 回避モンタージュの再生
-	if (UAnimInstance* AnimInst = Owner->GetMesh()->GetAnimInstance())
+	if (IsValid(DodgeMontage))
 	{
-		if (IsValid(DodgeMontage))
-		{
-			AnimInst->Montage_Play(DodgeMontage);
-		}
+		Owner->PlayAnimMontage(DodgeMontage);
 	}
 }
 
-// ジャスト回避を通知
-void UDodgeComponent::ApplyJustDodge()
+// ジャスト回避成功を通知
+void UDodgeComponent::OnJustDodgeSuccess()
 {
 	// ジャスト回避成功イベントを発火
 	OnJustDodgeDelegate.Broadcast();

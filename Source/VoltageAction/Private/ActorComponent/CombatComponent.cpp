@@ -6,6 +6,7 @@
 #include <Interface/AttackReceiver.h>
 #include <Player/PlayerCharacter.h>
 #include <ActorComponent/DodgeComponent.h>
+#include <ActorComponent/ParryComponent.h>
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -31,41 +32,13 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 }
 
 // 攻撃処理
-void UCombatComponent::Attack(AActor* DamagedActor, float Damage)
-{
-	if (DamagedActor == nullptr)
-		return;
-
-	AActor* AttackedOwner = GetOwner();
-	if (AttackedOwner == nullptr)
-		return;
-
-	// 送信する攻撃情報を作成
-	FAttackData AttackData;
-	AttackData.Damage = Damage;
-
-	IAttackReceiver* AttackReceiver = Cast<IAttackReceiver>(DamagedActor);
-	if (AttackReceiver)
-	{
-		// 攻撃を受ける側で攻撃受信
-		EAttackResult Result = AttackReceiver->ReceiveAttack(AttackData);
-
-		// 当たっていたらダメージイベントを発火
-		if (Result == EAttackResult::Hit)
-		{
-			UGameplayStatics::ApplyDamage(DamagedActor, Damage, AttackedOwner->GetInstigatorController(), AttackedOwner, UDamageType::StaticClass());
-		}
-	}
-}
-
-// 攻撃処理
 EAttackResult UCombatComponent::ReceiveAttack(const FAttackData& AttackData)
 {
 	AActor* DamagedOwner = GetOwner();
 	if (DamagedOwner == nullptr)
 		return EAttackResult::None;
 
-	// 無敵状態なら攻撃を無効化
+	// 無敵状態なら無効
 	if(bIsInvincible)
 		return EAttackResult::None;
 
@@ -74,17 +47,26 @@ EAttackResult UCombatComponent::ReceiveAttack(const FAttackData& AttackData)
 	{
 		if (DodgeComp->IsJustDodging())
 		{
-			// ジャスト回避を通知
-			DodgeComp->ApplyJustDodge();
+			// ジャスト回避成功を通知
+			DodgeComp->OnJustDodgeSuccess();
 
 			return EAttackResult::JustDodge;
 		}
 	}
 
-	// #TODO : パリィ判定, etc...
+	// パリィ判定
+	if (UParryComponent* ParryComp = DamagedOwner->FindComponentByClass<UParryComponent>())
+	{
+		if (ParryComp->IsParrying())
+		{
+			// パリィ成功を通知
+			ParryComp->OnParrySuccess();
 
+			return EAttackResult::Parry;
+		}
+	}
 
-	// 攻撃受信イベント発火
+	// 攻撃成功
 	return EAttackResult::Hit;
 }
 
@@ -122,3 +104,12 @@ void UCombatComponent::OnEndInvincible()
 	UE_LOG(LogTemp, Log, TEXT("Invincibility ended."));
 }
 
+// 入力時呼ばれる攻撃イベント
+void UCombatComponent::OnAttack()
+{
+}
+
+// 入力時呼ばれるパリィイベント
+void UCombatComponent::OnParry()
+{
+}

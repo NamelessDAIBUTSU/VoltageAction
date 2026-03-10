@@ -7,6 +7,8 @@
 #include "Interface/AttackReceiver.h"
 #include "CombatComponent.generated.h"
 
+class UAnimMontage;
+
 // 攻撃受信デリゲート
 DECLARE_MULTICAST_DELEGATE(FOnReceiveAttackDelegate);
 
@@ -28,9 +30,6 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	// 攻撃処理
-	void Attack(AActor* DamagedActor, float Damage);
-
 	// 攻撃受信処理
 	EAttackResult ReceiveAttack(const FAttackData& AttackData);
 
@@ -43,6 +42,10 @@ public: /* コールバック */
 	// 無敵状態の終了
 	void OnEndInvincible();
 
+	// 入力時呼ばれる攻撃イベント
+	void OnAttack();
+	// 入力時呼ばれるパリィイベント
+	void OnParry();
 
 public:
 	// 攻撃受信デリゲート

@@ -29,6 +29,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UCombatComponent> CombatComp;
 
+	// 攻撃コンポーネント
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UAttackComponent> AttackComp;
+
 	// HP管理コンポーネント
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UHealthComponent> HPComp;

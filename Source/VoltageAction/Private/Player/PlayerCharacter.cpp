@@ -10,6 +10,7 @@
 #include "ActorComponent/CombatComponent.h"
 #include "ActorComponent/HealthComponent.h"
 #include "ActorComponent/WeaponComponent.h"
+#include "ActorComponent/AttackComponent.h"
 #include <Voltage/VoltageManager.h>
 
 // Sets default values
@@ -40,8 +41,11 @@ APlayerCharacter::APlayerCharacter()
 	// コンポーネントの作成
 	DodgeComp = CreateDefaultSubobject<UDodgeComponent>(TEXT("Dodge"));
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat"));
+	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("Attack"));
 	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
 	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("Weapon"));
+
+
 }
 
 // Called when the game starts or when spawned
@@ -52,7 +56,7 @@ void APlayerCharacter::BeginPlay()
 	// イベントのバインド
 	if (UVoltageManager* VoltageManager = GetWorld()->GetSubsystem<UVoltageManager>())
 	{
-		// イベント：ジャスト回避
+		// ジャスト回避
 		if (DodgeComp)
 		{
 			// ボルテージ増加
@@ -67,11 +71,34 @@ void APlayerCharacter::BeginPlay()
 
 		if (HPComp)
 		{
-			// イベント：被ダメージ
+			// 被ダメージ
 			HPComp->OnDamagedDelegate.AddUObject(VoltageManager, &UVoltageManager::OnTakeDamage);
 
-			// イベント：死亡
+			// 死亡
 			//HPComp->OnDeathDelegate.AddUObject(, &::);
+		}
+	}
+
+	// 武器の生成
+	if (WeaponActorClass)
+	{
+		if (WeaponComp)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			AWeaponActorBase* SpawnedWeapon = GetWorld()->SpawnActor<AWeaponActorBase>(WeaponActorClass, SpawnParams);
+			if (SpawnedWeapon)
+			{
+				WeaponComp->SetWeapon(SpawnedWeapon);
+			}
+
+			// 武器をソケットに装着
+			USkeletalMeshComponent* MeshComp = GetMesh();
+			if (MeshComp && SpawnedWeapon)
+			{
+				FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
+				SpawnedWeapon->AttachToComponent(MeshComp, AttachRules, SpawnedWeapon->GetAttachSocketName());
+			}
 		}
 	}
 }
@@ -101,21 +128,47 @@ EAttackResult APlayerCharacter::ReceiveAttack(const FAttackData& AttackData)
 	return EAttackResult::None;
 }
 
-void APlayerCharacter::RotateCamera(FVector2D RotateVec)
+// 移動
+void APlayerCharacter::TryMove(const FInputActionValue& Value)
+{
+	// 攻撃中なら移動しない
+	if (AttackComp && AttackComp->IsAttacking())
+		return;
+
+	const FVector2D InputAxis = Value.Get<FVector2D>();
+
+	// カメラ軸で移動
+	FRotator CameraRot = GetControlRotation();
+	// カメラの回転から前方向と右方向を計算
+	FRotationMatrix CameraRotMat(CameraRot);
+	FVector Forward = CameraRotMat.GetUnitAxis(EAxis::X);
+	FVector Right = CameraRotMat.GetUnitAxis(EAxis::Y);
+
+	// 移動
+	AddMovementInput(Forward, InputAxis.X);
+	AddMovementInput(Right, InputAxis.Y);
+}
+
+// カメラ回転
+void APlayerCharacter::RotateCamera(const FInputActionValue& Value)
 {
 	if (IsValid(SpringArmComp) == false)
 		return;
 
-	if (RotateVec.X != 0.f)
+	const FVector2D InputAxis = Value.Get<FVector2D>();
+	if (InputAxis.IsZero())
+		return;
+
+	if (InputAxis.X != 0.f)
 	{
 		//float XRotateSpeed = RotateVec.X < 0.f ? CameraXRotateSpeed * -1.f : CameraXRotateSpeed;
-		float XRotateSpeed = RotateVec.X * CameraXRotateSpeed;
+		float XRotateSpeed = InputAxis.X * CameraXRotateSpeed;
 		AddControllerYawInput(XRotateSpeed);
 	}
-	if (RotateVec.Y != 0.f)
+	if (InputAxis.Y != 0.f)
 	{
 		//float YRotateSpeed = RotateVec.Y < 0.f ? CameraYRotateSpeed * -1.f : CameraYRotateSpeed;
-		float YRotateSpeed = RotateVec.Y * CameraYRotateSpeed;
+		float YRotateSpeed = InputAxis.Y * CameraYRotateSpeed;
 		AddControllerPitchInput(YRotateSpeed);
 	}
 }

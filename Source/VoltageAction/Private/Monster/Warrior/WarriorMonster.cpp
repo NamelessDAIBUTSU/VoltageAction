@@ -8,6 +8,7 @@
 #include <ActorComponent/DodgeComponent.h>
 #include <ActorComponent/CombatComponent.h>
 #include "ActorComponent/WeaponComponent.h"
+#include "ActorComponent/AttackComponent.h"
 
 AWarriorMonster::AWarriorMonster()
 {
@@ -60,8 +61,9 @@ void AWarriorMonster::OnAttackCollisionOverlapBegin(UPrimitiveComponent* Overlap
 	if (Player == nullptr)
 		return;
 
-	if (CombatComp)
+	// 攻撃ヒットを処理
+	if (AttackComp)
 	{
-		CombatComp->Attack(Player, AttackDamage);
+		AttackComp->HandleAttackHit(Player);
 	}
 }
