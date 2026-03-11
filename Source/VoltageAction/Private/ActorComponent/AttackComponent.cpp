@@ -7,25 +7,25 @@
 #include <Player/PlayerCharacter.h>
 #include <Kismet/GameplayStatics.h>
 
-// Sets default values for this component's properties
 UAttackComponent::UAttackComponent()
 {
 }
 
 
-// Called when the game starts
 void UAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 攻撃モンタージュ終了時イベントのバインド
-	if (ACharacter* Owner = Cast<ACharacter>(GetOwner()))
-	{
-		if (UAnimInstance* AnimInstance = Owner->GetMesh()->GetAnimInstance())
-		{
-			AnimInstance->OnMontageEnded.AddDynamic(this, &ThisClass::OnAttackMontageEnded);
-		}
-	}
+	//// 攻撃モンタージュ終了時イベントのバインド
+	//if (ACharacter* Owner = Cast<ACharacter>(GetOwner()))
+	//{
+	//	if (UAnimInstance* AnimInstance = Owner->GetMesh()->GetAnimInstance())
+	//	{
+	//		AnimInstance->OnMontageEnded.AddDynamic(this, &ThisClass::OnAttackMontageEnded);
+	//	}
+	//}
+
+	OnMontageEndDelegate.BindUObject(this, &ThisClass::OnAttackMontageEnded);
 }
 
 // 攻撃ヒット時
@@ -61,66 +61,62 @@ void UAttackComponent::HandleAttackHit(AActor* DamagedActor)
 }
 
 // 攻撃アクション発生時
-void UAttackComponent::TryAttack(UComboDataAsset* AttackData)
+void UAttackComponent::TryAttack(UComboDataAsset* NextComboData)
 {
-	if (AttackData == nullptr || AttackData->ComboAttacks.IsEmpty())
+	if (NextComboData == nullptr || NextComboData->ComboAttacks.IsEmpty())
 		return;
 
-	// #TODO : 自身の状態によって攻撃が可能ではない場合、ここではじく
-	{
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
+	if (PlayerCharacter == nullptr)
+		return;
 
-	}
+	// 攻撃不可状態であれば抜ける
+	if (PlayerCharacter->CanAttackState() == false)
+		return;
 
-	// コンボデータが継続ではない場合、現在のコンボデータをリセットする
-	if (GetCurrentComboData() != AttackData)
-	{
-		SetCurrentComboData(AttackData);
-	}
+	// 次の攻撃がコンボの初撃になるか
+	bool bIsFirstAttackInCombo = CurrentComboData != NextComboData || IsFinalAttackInCurrentCombo();
 
-	// コンボ継続かどうか
-	bool bIsComboAttack = false;
+	// コンボの初撃の場合、Idle状態ではないなら抜ける
+	if (PlayerCharacter->GetPlayerState() != EPlayerState::Idle && bIsFirstAttackInCombo)
+		return;
 
-	// コンボ攻撃可能な場合、コンボ継続
-	if (bCanCombo && IsFinalAttackInCurrentCombo() == false)
+	// コンボ継続
+	if (bIsFirstAttackInCombo == false)
 	{
 		CurrentComboIndex++;
-
-		bIsComboAttack = true;
 	}
-	// コンボの最初に戻る
+	// 別コンボデータの場合、コンボ情報をリセット
+	// #MEMO : 同じコンボでも一周したら上書きされるけど問題なし
 	else
 	{
+		CurrentComboData = NextComboData;
 		CurrentComboIndex = 0;
 	}
 
-	if (ACharacter* Owner = Cast<ACharacter>(GetOwner()))
+	// コンボの初撃の場合、再生中のモンタージュを停止
+	if (bIsFirstAttackInCombo)
 	{
-		// コンボ継続ではない場合、現在のモンタージュを停止
-		if (bIsComboAttack == false)
+		if (UAnimInstance* Anim = PlayerCharacter->GetMesh()->GetAnimInstance())
 		{
-			if (UAnimInstance* Anim = Owner->GetMesh()->GetAnimInstance())
-			{
-				Anim->Montage_Stop(0.f, Anim->GetCurrentActiveMontage());
-			}
-		}
-
-		// 攻撃モンタージュを再生
-		UAnimMontage* AttackMontage = AttackData->ComboAttacks[CurrentComboIndex]->AttackMontage;
-		if (IsValid(AttackMontage))
-		{
-			Owner->PlayAnimMontage(AttackMontage);
-
-			bIsAttacking = true;
+			Anim->Montage_Stop(0.f, Anim->GetCurrentActiveMontage());
 		}
 	}
-}
 
-// 現在のコンボデータの設定
-void UAttackComponent::SetCurrentComboData(UComboDataAsset* ComboData)
-{
-	CurrentComboData = ComboData;
-	CurrentComboIndex = 0;
-	bCanCombo = false;
+	if (UAnimMontage* AttackMontage = NextComboData->ComboAttacks[CurrentComboIndex]->AttackMontage)
+	{
+		// 攻撃モンタージュ再生
+		PlayerCharacter->PlayAnimMontage(AttackMontage);
+
+		// 攻撃ステートに移行
+		PlayerCharacter->SetPlayerState(EPlayerState::Attack);
+
+		// モンタージュ終了時のイベントを設定
+		if (UAnimInstance* AnimInstance = PlayerCharacter->GetMesh()->GetAnimInstance())
+		{
+			AnimInstance->Montage_SetEndDelegate(OnMontageEndDelegate, AttackMontage);
+		}
+	}
 }
 
 // 現在の攻撃データを取得
@@ -164,43 +160,42 @@ void UAttackComponent::ExecAttack(EAttackResult AttackResult, const FAttackData&
 	}
 }
 
-// 攻撃モンタージュ終了時イベント
-// #MEMO : モンタージュが中断ではなく、正常に終了したときのみ処理
+// 攻撃モンタージュ正常終了時イベント
 void UAttackComponent::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	APlayerCharacter* Owner = Cast<APlayerCharacter>(GetOwner());
 	if (Owner == nullptr)
 		return;
 
-	// 攻撃中ではない場合イベントを発火しない
-	if (bIsAttacking == false)
-		return;
-
-	// 攻撃コンポーネント取得
 	if (GetCurrentAttackData() == nullptr)
 		return;
-
-	// モンタージュの連続再生による中断であれば、リセットしない
+	
+	// 他モンタージュによる中断
 	if (bInterrupted)
-		return;
+	{
+		// 攻撃以外のモンタージュによる中断
+		if (Owner->IsAttackState() == false)
+		{
+			// コンボ情報をリセット
+			CurrentComboIndex = INDEX_NONE;
+		}
+	}
+	// 攻撃モンタージュ正常終了
+	else
+	{
+		// プレイヤー状態を通常に戻す
+		Owner->SetPlayerState(EPlayerState::Idle);
 
-
-	UE_LOG(LogTemp, Log, TEXT("Montage End!!"), CurrentComboIndex);
-
-	CurrentComboIndex = 0;
-
-	// 攻撃中フラグをリセット
-	bIsAttacking = false;
-
-	// コンボ継続フラグをリセット
-	SetCanCombo(false);
+		// コンボ情報をリセット
+		CurrentComboIndex = INDEX_NONE;
+	}
+	
+	UE_LOG(LogTemp, Log, TEXT("Montage End!! bInterrupted(%hs)"), bInterrupted ? "True" : "False");
 }
 
 // 現在コンボの最終攻撃か
 bool UAttackComponent::IsFinalAttackInCurrentCombo()
 {
-	if (IsAttacking() == false)
-		return false;
 	if (GetCurrentComboData() == nullptr)
 		return false;
 

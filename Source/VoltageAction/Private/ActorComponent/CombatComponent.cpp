@@ -42,27 +42,34 @@ EAttackResult UCombatComponent::ReceiveAttack(const FAttackData& AttackData)
 	if(bIsInvincible)
 		return EAttackResult::None;
 
-	// ジャスト回避判定
-	if (UDodgeComponent* DodgeComp = DamagedOwner->FindComponentByClass<UDodgeComponent>())
+	// プレイヤー用判定
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(DamagedOwner))
 	{
-		if (DodgeComp->IsJustDodging())
+		// ジャスト回避
+		if (PlayerCharacter->GetPlayerState() == EPlayerState::Dodge)
 		{
-			// ジャスト回避成功を通知
-			DodgeComp->OnJustDodgeSuccess();
+			if (UDodgeComponent* DodgeComp = DamagedOwner->FindComponentByClass<UDodgeComponent>())
+			{
+				if (DodgeComp->IsJustDodging())
+				{
+					// ジャスト回避成功を通知
+					DodgeComp->OnJustDodgeSuccess();
 
-			return EAttackResult::JustDodge;
+					return EAttackResult::JustDodge;
+				}
+			}
 		}
-	}
 
-	// パリィ判定
-	if (UParryComponent* ParryComp = DamagedOwner->FindComponentByClass<UParryComponent>())
-	{
-		if (ParryComp->IsParrying())
+		// パリィ
+		if (PlayerCharacter->GetPlayerState() == EPlayerState::Parry)
 		{
-			// パリィ成功を通知
-			ParryComp->OnParrySuccess();
+			if (UParryComponent* ParryComp = DamagedOwner->FindComponentByClass<UParryComponent>())
+			{
+				// パリィ成功を通知
+				ParryComp->OnParrySuccess();
 
-			return EAttackResult::Parry;
+				return EAttackResult::Parry;
+			}
 		}
 	}
 

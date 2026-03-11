@@ -9,48 +9,39 @@
 // Sets default values for this component's properties
 UDodgeComponent::UDodgeComponent()
 {
-	//PrimaryComponentTick.bCanEverTick = true;
 }
 
-
-// Called when the game starts
 void UDodgeComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
-}
-
-
-// Called every frame
-void UDodgeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	// モンタージュ終了時イベントのバインド
+	OnMontageEndDelegate.BindUObject(this, &ThisClass::OnDodgeMontageEnded);
 }
 
 // 回避行動
 void UDodgeComponent::TryDodge()
 {
-	APlayerCharacter* Owner = Cast<APlayerCharacter>(GetOwner());
-	if (Owner == nullptr)
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
+	if (PlayerCharacter == nullptr)
 		return;
 
-	if (UCharacterMovementComponent* MoveComp = Owner->GetCharacterMovement())
-	{
-		if (MoveComp->IsFalling())
-			return;
-	}
-
-	// すでに回避モーション中なら何もしない
-	if (IsDodging())
+	if (PlayerCharacter->CanDodgeState() == false)
 		return;
 
 	// 回避モンタージュの再生
 	if (IsValid(DodgeMontage))
 	{
-		Owner->PlayAnimMontage(DodgeMontage);
+		PlayerCharacter->PlayAnimMontage(DodgeMontage);
+
+		// 回避状態に設定
+		PlayerCharacter->SetPlayerState(EPlayerState::Dodge);
+
+		// モンタージュ終了時のイベントを設定
+		if (UAnimInstance* AnimInstance = PlayerCharacter->GetMesh()->GetAnimInstance())
+		{
+			AnimInstance->Montage_SetEndDelegate(OnMontageEndDelegate, DodgeMontage);
+		}
 	}
 }
 
@@ -62,21 +53,6 @@ void UDodgeComponent::OnJustDodgeSuccess()
 
 	// ジャスト回避判定を終了
 	JustDodgeEndTime = 0.f;
-}
-
-// 回避中か
-bool UDodgeComponent::IsDodging()
-{
-	APlayerCharacter* Owner = Cast<APlayerCharacter>(GetOwner());
-	if (Owner == nullptr)
-		return false;
-
-	if (UAnimInstance* AnimInst = Owner->GetMesh()->GetAnimInstance())
-	{
-		return AnimInst->Montage_IsPlaying(DodgeMontage);
-	}
-
-	return false;
 }
 
 // ジャスト回避判定
@@ -96,4 +72,13 @@ void UDodgeComponent::StartInvincible()
 float UDodgeComponent::GetInvincibleEndTime() const
 {
 	return JustDodgeEndTime;
+}
+
+// 回避終了時のイベント
+void UDodgeComponent::OnDodgeMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (APlayerCharacter* Owner = Cast<APlayerCharacter>(GetOwner()))
+	{
+		Owner->SetPlayerState(EPlayerState::Idle);
+	}
 }

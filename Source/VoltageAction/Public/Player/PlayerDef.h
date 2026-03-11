@@ -5,15 +5,15 @@
 #include "CoreMinimal.h"
 #include "PlayerDef.generated.h"
 
-// アストラルに保存する軌道情報
-USTRUCT(BlueprintType)
-struct FAstralOrbitData
+UENUM()
+enum class EPlayerState
 {
-	GENERATED_BODY()
-
-public:
-	// 前回からの経過時間
-	float DeltaSec;
-	// 目標トランスフォーム
-	FTransform TargetTransform;
+	Idle		UMETA(DisplayName = "通常"),
+	Parry		UMETA(DisplayName = "パリィ"),
+	Parried		UMETA(DisplayName = "パリィ語の入力待機"),
+	Attack		UMETA(DisplayName = "攻撃"),
+	Attacked	UMETA(DisplayName = "攻撃後の入力待機"),
+	Hit			UMETA(DisplayName = "ヒット"),
+	Dodge		UMETA(DisplayName = "回避"),
+	Dead		UMETA(DisplayName = "死亡"),
 };

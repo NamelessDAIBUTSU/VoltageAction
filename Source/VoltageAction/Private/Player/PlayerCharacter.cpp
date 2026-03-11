@@ -11,6 +11,7 @@
 #include "ActorComponent/HealthComponent.h"
 #include "ActorComponent/WeaponComponent.h"
 #include "ActorComponent/AttackComponent.h"
+#include "ActorComponent/ParryComponent.h"
 #include <Voltage/VoltageManager.h>
 
 // Sets default values
@@ -44,8 +45,7 @@ APlayerCharacter::APlayerCharacter()
 	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("Attack"));
 	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
 	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("Weapon"));
-
-
+	ParryComp = CreateDefaultSubobject<UParryComponent>(TEXT("Parry"));
 }
 
 // Called when the game starts or when spawned
@@ -131,8 +131,7 @@ EAttackResult APlayerCharacter::ReceiveAttack(const FAttackData& AttackData)
 // 移動
 void APlayerCharacter::TryMove(const FInputActionValue& Value)
 {
-	// 攻撃中なら移動しない
-	if (AttackComp && AttackComp->IsAttacking())
+	if (PlayerState != EPlayerState::Idle)
 		return;
 
 	const FVector2D InputAxis = Value.Get<FVector2D>();
@@ -171,4 +170,9 @@ void APlayerCharacter::RotateCamera(const FInputActionValue& Value)
 		float YRotateSpeed = InputAxis.Y * CameraYRotateSpeed;
 		AddControllerPitchInput(YRotateSpeed);
 	}
+}
+
+void APlayerCharacter::SetPlayerState(EPlayerState State)
+{
+	PlayerState = State;
 }

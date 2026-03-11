@@ -16,16 +16,10 @@ class VOLTAGEACTION_API UDodgeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UDodgeComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	// 回避アクション
@@ -34,8 +28,6 @@ public:
 	// ジャスト回避成功を通知
 	void OnJustDodgeSuccess();
 
-	// 回避中か
-	bool IsDodging();
 	// ジャスト回避判定
 	bool IsJustDodging();
 
@@ -44,6 +36,11 @@ public:
 
 	// 無敵時間終了時刻の取得
 	float GetInvincibleEndTime() const;
+
+private:
+	// 回避終了時のイベント
+	UFUNCTION()
+	void OnDodgeMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 public:
 	// ジャスト回避通知デリゲート
@@ -60,4 +57,7 @@ private:
 
 	// ジャスト回避状態終了時間
 	float JustDodgeEndTime = 0.f;
+
+	// 回避モンタージュ終了時のデリゲート
+	FOnMontageEnded OnMontageEndDelegate;
 };

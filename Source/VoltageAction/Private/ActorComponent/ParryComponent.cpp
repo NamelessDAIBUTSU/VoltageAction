@@ -2,36 +2,46 @@
 
 
 #include "ActorComponent/ParryComponent.h"
+#include "Player/PlayerCharacter.h"
 
-// Sets default values for this component's properties
 UParryComponent::UParryComponent()
 {
 }
 
 
-// Called when the game starts
 void UParryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	// モンタージュ終了時イベントのバインド
+	OnMontageEndDelegate.BindUObject(this, &ThisClass::OnParryMontageEnded);
 }
 
 // パリィ処理
 void UParryComponent::TryParry()
 {
-	// パリィモンタージュを再生
-	if (ParryMontage)
+	if (IsValid(ParryMontage) == false)
+		return;
+
+	// 自身の状態によってパリィが可能ではない場合、ここではじく
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner()))
 	{
-		AActor* Owner = GetOwner();
-		if (Owner)
+		if (PlayerCharacter->CanParryState() == false)
+			return;
+	}
+
+	// パリィモンタージュを再生
+	if (APlayerCharacter* Owner = Cast<APlayerCharacter>(GetOwner()))
+	{
+		Owner->PlayAnimMontage(ParryMontage);
+
+		// プレイヤー状態をパリィに設定
+		Owner->SetPlayerState(EPlayerState::Parry);
+
+		// モンタージュ終了時のイベントを設定
+		if (UAnimInstance* AnimInstance = Owner->GetMesh()->GetAnimInstance())
 		{
-			UAnimInstance* AnimInstance = Owner->FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance();
-			if (AnimInstance)
-			{
-				AnimInstance->Montage_Play(ParryMontage);
-			}
+			AnimInstance->Montage_SetEndDelegate(OnMontageEndDelegate, ParryMontage);
 		}
 	}
 }
@@ -39,5 +49,18 @@ void UParryComponent::TryParry()
 // パリィ成功時の処理
 void UParryComponent::OnParrySuccess()
 {
+}
+
+// パリィ終了時のイベント
+void UParryComponent::OnParryMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	// 中断の場合は、中断側でステート変更が行われているため抜ける
+	if (bInterrupted)
+		return;
+
+	if (APlayerCharacter* Owner = Cast<APlayerCharacter>(GetOwner()))
+	{
+		Owner->SetPlayerState(EPlayerState::Idle);
+	}
 }
 

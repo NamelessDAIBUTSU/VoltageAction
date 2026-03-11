@@ -27,17 +27,10 @@ public:
 	void HandleAttackHit(AActor* DamagedActor);
 
 	// 攻撃アクション発生時
-	void TryAttack(UComboDataAsset* AttackData);
+	void TryAttack(UComboDataAsset* NextComboData);
 
 	// 現在のコンボデータ
 	UComboDataAsset* GetCurrentComboData() const { return CurrentComboData.Get(); }
-	void SetCurrentComboData(UComboDataAsset* ComboData);
-
-	// 攻撃中か
-	bool IsAttacking() const { return bIsAttacking; }
-
-	// コンボ継続可能フラグの設定
-	void SetCanCombo(bool Flag) { bCanCombo = Flag; }
 
 private:
 	// 現在の攻撃データを取得
@@ -59,11 +52,8 @@ private:
 	TWeakObjectPtr<UComboDataAsset> CurrentComboData = nullptr;
 
 	// 現在のコンボインデックス
-	int32 CurrentComboIndex = 0;
+	int32 CurrentComboIndex = INDEX_NONE;
 
-	// コンボ継続可能時間か
-	bool bCanCombo = false;
-
-	// 攻撃中か
-	bool bIsAttacking = false;
+	// 攻撃モンタージュ終了時のデリゲート
+	FOnMontageEnded OnMontageEndDelegate;
 };

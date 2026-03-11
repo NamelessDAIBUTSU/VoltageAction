@@ -24,17 +24,19 @@ public:
 	// パリィ処理
 	void TryParry();
 
-	// パリィ中か
-	bool IsParrying() const { return bIsParrying; }
-
 	// パリィ成功を通知
 	void OnParrySuccess();
+
+private:
+	// パリィ終了時のイベント
+	UFUNCTION()
+	void OnParryMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 private:
 	// パリィモンタージュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> ParryMontage;
 
-	// パリィ中か
-	bool bIsParrying = false;;
+	// パリィモンタージュ終了時のデリゲート
+	FOnMontageEnded OnMontageEndDelegate;
 };
