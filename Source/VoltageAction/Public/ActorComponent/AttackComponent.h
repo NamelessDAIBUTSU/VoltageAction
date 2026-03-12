@@ -31,13 +31,12 @@ public:
 	UComboDataAsset* GetCurrentComboData() const;
 	void SetCurrentAttackData(UComboDataAsset* NewComboData);
 
+	// 現在の攻撃データを取得
+	class UAttackDataAsset* GetCurrentAttackData() const;
+
 public: /* プレイヤー用 */
 	// 攻撃アクション発生時
 	void TryAttack(UComboDataAsset* NextComboData);
-
-private:
-	// 現在の攻撃データを取得
-	class UAttackDataAsset* GetCurrentAttackData() const;
 
 	// 攻撃イベント実行
 	void ExecAttack(EAttackResult AttackResult, const FAttackData& AttackData);

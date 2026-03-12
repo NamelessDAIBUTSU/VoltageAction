@@ -34,6 +34,18 @@ void AMonsterBase::Tick(float DeltaTime)
 
 }
 
+// 与えるダメージを取得
+float AMonsterBase::GetFinalDamage()
+{
+	if (AttackComp == nullptr)
+		return 0.f;
+
+	// 敵のベースダメージ × 現在の攻撃データの割合
+
+
+	return 0.f;
+}
+
 void AMonsterBase::InitializeEnemyHPBarWidget()
 {
 	// プレイヤーコントローラーの取得

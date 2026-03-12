@@ -7,14 +7,14 @@
 #include "InputActionValue.h"
 #include "Interface/Weighted.h"
 #include <Player/PlayerDef.h>
-#include "Interface/AttackReceiver.h"
+#include "Interface/Interface_DamageGetter.h"
 #include "PlayerCharacter.generated.h"
 
 class APlayerGhost;
 class UGhostManagerComponent;
 
 UCLASS()
-class VOLTAGEACTION_API APlayerCharacter : public ACharacter, public IAttackReceiver
+class VOLTAGEACTION_API APlayerCharacter : public ACharacter, public IDamageGetter
 {
 	GENERATED_BODY()
 
@@ -29,9 +29,9 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-public: /* IAttackReceiver */
-	// 攻撃を受信
-	virtual EAttackResult ReceiveAttack(const FAttackData& AttackData) override;
+public: /* IDamageGetter */
+	// 与えるダメージを取得
+	virtual float GetFinalDamage() override;
 
 public: /* 入力によるアクション */
 	// 移動
@@ -97,10 +97,6 @@ private: /* コンポーネント */
 	TObjectPtr<class UWeaponComponent> WeaponComp;
 
 private:
-	// 生成する武器アクタのクラス
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AWeaponActorBase> WeaponActorClass;
-
 	// 現在の状態
 	EPlayerState PlayerState = EPlayerState::Idle;
 };

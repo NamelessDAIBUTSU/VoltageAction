@@ -39,12 +39,12 @@ void UAttackComponent::HandleAttackHit(AActor* DamagedActor)
 
 	// 送信する攻撃情報を作成
 	FAttackData AttackData;
-	AttackData.DamagedActor = DamagedActor;
-	if (UWeaponComponent* WeaponComp = AttackerActor->FindComponentByClass<UWeaponComponent>())
 	{
-		if (AWeaponActorBase* Weapon = WeaponComp->GetWeapon())
+		AttackData.DamagedActor = DamagedActor;
+		// 敵とプレイヤーの処理統一のため、ダメージは専用のインターフェースから取得
+		if (IDamageGetter* DamageGetter = Cast<IDamageGetter>(AttackerActor))
 		{
-			AttackData.Damage = Weapon->GetBaseDamage() * CurrentAttackData->DamageMultiplier;
+			AttackData.Damage = DamageGetter->GetFinalDamage();
 		}
 	}
 

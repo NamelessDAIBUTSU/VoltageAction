@@ -13,6 +13,7 @@
 #include "ActorComponent/AttackComponent.h"
 #include "ActorComponent/ParryComponent.h"
 #include <Voltage/VoltageManager.h>
+#include <Attack/ComboDataAsset.h>
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -79,28 +80,28 @@ void APlayerCharacter::BeginPlay()
 		}
 	}
 
-	// 武器の生成
-	if (WeaponActorClass)
-	{
-		if (WeaponComp)
-		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			AWeaponActorBase* SpawnedWeapon = GetWorld()->SpawnActor<AWeaponActorBase>(WeaponActorClass, SpawnParams);
-			if (SpawnedWeapon)
-			{
-				WeaponComp->SetWeapon(SpawnedWeapon);
-			}
+	//// 武器の生成
+	//if (WeaponActorClass)
+	//{
+	//	if (WeaponComp)
+	//	{
+	//		FActorSpawnParameters SpawnParams;
+	//		SpawnParams.Owner = this;
+	//		AWeaponActorBase* SpawnedWeapon = GetWorld()->SpawnActor<AWeaponActorBase>(WeaponActorClass, SpawnParams);
+	//		if (SpawnedWeapon)
+	//		{
+	//			WeaponComp->SetWeapon(SpawnedWeapon);
+	//		}
 
-			// 武器をソケットに装着
-			USkeletalMeshComponent* MeshComp = GetMesh();
-			if (MeshComp && SpawnedWeapon)
-			{
-				FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
-				SpawnedWeapon->AttachToComponent(MeshComp, AttachRules, SpawnedWeapon->GetAttachSocketName());
-			}
-		}
-	}
+	//		// 武器をソケットに装着
+	//		USkeletalMeshComponent* MeshComp = GetMesh();
+	//		if (MeshComp && SpawnedWeapon)
+	//		{
+	//			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
+	//			SpawnedWeapon->AttachToComponent(MeshComp, AttachRules, SpawnedWeapon->GetAttachSocketName());
+	//		}
+	//	}
+	//}
 }
 
 // Called every frame
@@ -116,16 +117,22 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-// 攻撃を受信
-EAttackResult APlayerCharacter::ReceiveAttack(const FAttackData& AttackData)
+// 与えるダメージを取得
+float APlayerCharacter::GetFinalDamage()
 {
-	// 戦闘はCombatComponentに任せる
-	if (CombatComp)
+	if (WeaponComp == nullptr || AttackComp == nullptr)
+		return 0.f;
+
+	// 武器のベースダメージ × 現在の攻撃データの割合
+	if (AWeaponActorBase* Weapon = WeaponComp->GetWeapon())
 	{
-		return CombatComp->ReceiveAttack(AttackData);
+		if (UAttackDataAsset* CurrentAttackData = AttackComp->GetCurrentAttackData())
+		{
+			return Weapon->GetBaseDamage() * CurrentAttackData->DamageMultiplier;
+		}
 	}
 
-	return EAttackResult::None;
+	return 0.f;
 }
 
 // 移動

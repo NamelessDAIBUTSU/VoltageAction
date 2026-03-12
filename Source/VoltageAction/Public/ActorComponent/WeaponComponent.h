@@ -32,7 +32,15 @@ public:
 	AWeaponActorBase* GetWeapon() const { return EquippedWeapon; }
 	void SetWeapon(AWeaponActorBase* NewWeapon) { EquippedWeapon = NewWeapon; }
 
+	// 初期生成する武器クラスの取得
+	TSubclassOf<AWeaponActorBase> GetInitWeapon() const { return InitWeaponActorClass; }
+
 private:
+	// 装備中の武器
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AWeaponActorBase> EquippedWeapon;
+
+	// 初期生成する武器クラス
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AWeaponActorBase> InitWeaponActorClass;
 };
