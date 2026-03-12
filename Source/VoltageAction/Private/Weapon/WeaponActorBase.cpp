@@ -66,6 +66,9 @@ void AWeaponActorBase::OnAttackCollisionOverlapBegin(UPrimitiveComponent* Overla
 		if (AttackComp)
 		{
 			AttackComp->HandleAttackHit(OtherActor);
+
+			// 多重ヒットを防ぐためにコリジョンを無効化
+			SetAttackCollision(false);
 		}
 	}
 }
