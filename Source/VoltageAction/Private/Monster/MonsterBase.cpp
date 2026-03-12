@@ -7,6 +7,7 @@
 #include <ActorComponent/HealthComponent.h>
 #include <ActorComponent/CombatComponent.h>
 #include <ActorComponent/AttackComponent.h>
+#include <ActorComponent/WeaponComponent.h>
 
 AMonsterBase::AMonsterBase()
 {
@@ -16,6 +17,7 @@ AMonsterBase::AMonsterBase()
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
+	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
 }
 
 void AMonsterBase::BeginPlay()

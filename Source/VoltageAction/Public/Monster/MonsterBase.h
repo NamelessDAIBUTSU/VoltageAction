@@ -36,4 +36,8 @@ protected:
 	// HP管理コンポーネント
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UHealthComponent> HPComp;
+
+	// 装備コンポーネント
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UWeaponComponent> WeaponComp;
 };

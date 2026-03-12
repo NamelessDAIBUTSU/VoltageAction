@@ -3,12 +3,23 @@
 
 #include "Monster/Warrior/AnimNotify_EnableAttackCollision.h"
 #include <Monster/Warrior/WarriorMonster.h>
+#include <ActorComponent/WeaponComponent.h>
 
 void UAnimNotify_EnableAttackCollision::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	// コリジョンの有効化
-	if (AWarriorMonster* Warrior = Cast<AWarriorMonster>(MeshComp->GetOwner()))
+	// 攻撃コリジョンの有効/無効化
+	ACharacter* Owner = Cast<ACharacter>(MeshComp->GetOwner());
+	if (Owner == nullptr)
+		return;
+
+	// 武器の取得
+	UWeaponComponent* EquipComp = Owner->FindComponentByClass<UWeaponComponent>();
+	if (EquipComp == nullptr)
+		return;
+
+	// 攻撃用コリジョンの有効/無効化
+	if (AWeaponActorBase* Weapon = EquipComp->GetWeapon())
 	{
-		Warrior->SetAttackCollisionEnabled(true);
+		Weapon->SetAttackCollision(bIsEnabled);
 	}
 }

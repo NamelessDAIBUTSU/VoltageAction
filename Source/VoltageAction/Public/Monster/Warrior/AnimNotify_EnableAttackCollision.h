@@ -16,4 +16,8 @@ class VOLTAGEACTION_API UAnimNotify_EnableAttackCollision : public UAnimNotify
 	
 public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+	
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool bIsEnabled;
 };

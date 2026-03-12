@@ -17,15 +17,12 @@ class VOLTAGEACTION_API AWeaponActorBase : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AWeaponActorBase();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 public:
@@ -39,6 +36,14 @@ public:
 	// 強攻撃コンボデータの取得
 	UComboDataAsset* GetHeavyComboData() const { return HeavyComboData; }
 
+	// 攻撃用コリジョンの有効/無効化
+	void SetAttackCollision(bool flag);
+
+public:
+	// 攻撃用コリジョンオーバーラップ時イベント
+	UFUNCTION()
+	void OnAttackCollisionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 private:
 	// スタティックメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
@@ -51,6 +56,10 @@ private:
 	// 基礎攻撃力
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	float BaseDamage = 10.f;
+
+	// 攻撃用コリジョン
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UBoxComponent> AttackCollision;
 
 private: /* 武器に紐づくコンボ攻撃データ */
 	// 弱攻撃コンボ

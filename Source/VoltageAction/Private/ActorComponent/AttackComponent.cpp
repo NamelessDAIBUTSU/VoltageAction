@@ -6,6 +6,8 @@
 #include <Attack/ComboDataAsset.h>
 #include <Player/PlayerCharacter.h>
 #include <Kismet/GameplayStatics.h>
+#include <ActorComponent/CombatComponent.h>
+#include <ActorComponent/WeaponComponent.h>
 
 UAttackComponent::UAttackComponent()
 {
@@ -16,19 +18,11 @@ void UAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//// 攻撃モンタージュ終了時イベントのバインド
-	//if (ACharacter* Owner = Cast<ACharacter>(GetOwner()))
-	//{
-	//	if (UAnimInstance* AnimInstance = Owner->GetMesh()->GetAnimInstance())
-	//	{
-	//		AnimInstance->OnMontageEnded.AddDynamic(this, &ThisClass::OnAttackMontageEnded);
-	//	}
-	//}
-
 	OnMontageEndDelegate.BindUObject(this, &ThisClass::OnAttackMontageEnded);
 }
 
-// 攻撃ヒット時
+// 攻撃処理
+// #MEMO : 攻撃用コリジョンのオーバーラップ時に呼ぶ
 void UAttackComponent::HandleAttackHit(AActor* DamagedActor)
 {
 	if (DamagedActor == nullptr)
@@ -46,18 +40,33 @@ void UAttackComponent::HandleAttackHit(AActor* DamagedActor)
 	// 送信する攻撃情報を作成
 	FAttackData AttackData;
 	AttackData.DamagedActor = DamagedActor;
-	AttackData.Damage = CurrentAttackData->DamageMultiplier;
-	AttackData.Knockback = 0.f;
-
-	// 受信のみのアクターが存在するかもしれないため、インターフェースで攻撃受信を行う
-	if (IAttackReceiver* AttackReceiver = Cast<IAttackReceiver>(DamagedActor))
+	if (UWeaponComponent* WeaponComp = AttackerActor->FindComponentByClass<UWeaponComponent>())
 	{
-		// 攻撃を受ける側で攻撃受信し、成否結果を取得
-		EAttackResult Result = AttackReceiver->ReceiveAttack(AttackData);
+		if (AWeaponActorBase* Weapon = WeaponComp->GetWeapon())
+		{
+			AttackData.Damage = Weapon->GetBaseDamage() * CurrentAttackData->DamageMultiplier;
+		}
+	}
+
+	// 受ける側の戦闘仲介コンポーネントを取得
+	if (UCombatComponent* CombatComp = DamagedActor->FindComponentByClass<UCombatComponent>())
+	{
+		// 攻撃を受信し、成否結果を取得
+		EAttackResult Result = CombatComp->ReceiveAttack(AttackData);
 
 		// 攻撃イベント実行
 		ExecAttack(Result, AttackData);
 	}
+}
+
+// 現在のコンボデータ
+UComboDataAsset* UAttackComponent::GetCurrentComboData() const 
+{
+	return CurrentComboData.Get(); 
+}
+void UAttackComponent::SetCurrentAttackData(UComboDataAsset* NewComboData) 
+{
+	CurrentComboData = NewComboData; 
 }
 
 // 攻撃アクション発生時
@@ -119,7 +128,7 @@ void UAttackComponent::TryAttack(UComboDataAsset* NextComboData)
 	}
 }
 
-// 現在の攻撃データを取得
+// 現在のコンボ攻撃データ
 UAttackDataAsset* UAttackComponent::GetCurrentAttackData() const
 {
 	if (CurrentComboData.IsValid() == false)

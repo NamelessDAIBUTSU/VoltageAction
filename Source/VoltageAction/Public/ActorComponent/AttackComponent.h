@@ -23,14 +23,17 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// 攻撃ヒット時
+	// 攻撃処理
+	// #MEMO : 攻撃用コリジョンのオーバーラップ時に呼ぶ
 	void HandleAttackHit(AActor* DamagedActor);
 
+	// 現在のコンボデータ
+	UComboDataAsset* GetCurrentComboData() const;
+	void SetCurrentAttackData(UComboDataAsset* NewComboData);
+
+public: /* プレイヤー用 */
 	// 攻撃アクション発生時
 	void TryAttack(UComboDataAsset* NextComboData);
-
-	// 現在のコンボデータ
-	UComboDataAsset* GetCurrentComboData() const { return CurrentComboData.Get(); }
 
 private:
 	// 現在の攻撃データを取得

@@ -22,7 +22,6 @@ void AWarriorMonster::OnConstruction(const FTransform& Transform)
 {
 	// スケルタルメッシュの手にアタッチ
 	SpearMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("weapon"));
-
 	
 }
 
@@ -65,5 +64,11 @@ void AWarriorMonster::OnAttackCollisionOverlapBegin(UPrimitiveComponent* Overlap
 	if (AttackComp)
 	{
 		AttackComp->HandleAttackHit(Player);
+
+		// 二重判定を防ぐためにコリジョンを無効化
+		if (AttackCollision)
+		{
+			AttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 	}
 }

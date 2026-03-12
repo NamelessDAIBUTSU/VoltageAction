@@ -14,7 +14,6 @@ struct FAttackData
 
 public:
 	float Damage = 0.f;
-	float Knockback = 0.f;
 	// 攻撃されたアクター
 	UPROPERTY()
 	TWeakObjectPtr<AActor> DamagedActor = nullptr;
