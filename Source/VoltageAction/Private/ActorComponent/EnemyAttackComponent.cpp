@@ -6,7 +6,8 @@
 #include <Kismet/GameplayStatics.h>
 #include <ActorComponent/CombatComponent.h>
 #include <ActorComponent/WeaponComponent.h>
-#include <Monster/MonsterBase.h>
+#include <Enemy/EnemyBase.h>
+#include "Enemy/EnemyDef.h"
 
 UEnemyAttackComponent::UEnemyAttackComponent()
 {
@@ -47,7 +48,7 @@ void UEnemyAttackComponent::TryAttack(UComboDataAsset* NextComboData)
 	if (NextComboData == nullptr || NextComboData->ComboAttacks.IsEmpty())
 		return;
 
-	AMonsterBase* Enemy = Cast<AMonsterBase>(GetOwner());
+	AEnemyBase* Enemy = Cast<AEnemyBase>(GetOwner());
 	if (Enemy == nullptr)
 		return;
 
@@ -85,7 +86,7 @@ void UEnemyAttackComponent::TryAttack(UComboDataAsset* NextComboData)
 // 攻撃モンタージュ終了時のコールバック
 void UEnemyAttackComponent::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	AMonsterBase* Enemy = Cast<AMonsterBase>(GetOwner());
+	AEnemyBase* Enemy = Cast<AEnemyBase>(GetOwner());
 	if (Enemy == nullptr)
 		return;
 

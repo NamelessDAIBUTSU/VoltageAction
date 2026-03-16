@@ -2,7 +2,7 @@
 
 
 #include "AI/Task/BTTask_SetRandomComboIndex.h"
-#include <Monster/MonsterBase.h>
+#include <Enemy/EnemyBase.h>
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include <ActorComponent/EnemyAttackComponent.h>
@@ -12,7 +12,7 @@ EBTNodeResult::Type UBTTask_SetRandomComboIndex::ExecuteTask(UBehaviorTreeCompon
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController == nullptr)
 		return EBTNodeResult::Failed;
-	AMonsterBase* Owner = Cast<AMonsterBase>(AIController->GetPawn());
+	AEnemyBase* Owner = Cast<AEnemyBase>(AIController->GetPawn());
 	if (Owner == nullptr)
 		return EBTNodeResult::Failed;
 	UEnemyAttackComponent* EAttackComp = Owner->FindComponentByClass<UEnemyAttackComponent>();

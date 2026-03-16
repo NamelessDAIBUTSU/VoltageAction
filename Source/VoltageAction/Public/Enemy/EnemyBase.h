@@ -5,16 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/Interface_DamageGetter.h"
-#include "MonsterData.h"
-#include "MonsterBase.generated.h"
+#include "EnemyDef.h"
+#include "EnemyBase.generated.h"
 
 UCLASS()
-class VOLTAGEACTION_API AMonsterBase : public ACharacter, public IDamageGetter
+class VOLTAGEACTION_API AEnemyBase : public ACharacter, public IDamageGetter
 {
 	GENERATED_BODY()
 
 public:
-	AMonsterBase();
+	AEnemyBase();
 
 protected:
 	virtual void BeginPlay() override;

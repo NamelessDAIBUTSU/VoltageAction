@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Monster/MonsterBase.h"
+#include "Enemy/EnemyBase.h"
 #include <PlayerController/MyPlayerController.h>
 #include <UI/UIManager.h>
 #include <ActorComponent/HealthComponent.h>
@@ -10,7 +10,7 @@
 #include <ActorComponent/WeaponComponent.h>
 #include "Attack/AttackDataAsset.h"
 
-AMonsterBase::AMonsterBase()
+AEnemyBase::AEnemyBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -21,7 +21,7 @@ AMonsterBase::AMonsterBase()
 	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComp"));
 }
 
-void AMonsterBase::BeginPlay()
+void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
@@ -29,14 +29,14 @@ void AMonsterBase::BeginPlay()
 	InitializeEnemyHPBarWidget();
 }
 
-void AMonsterBase::Tick(float DeltaTime)
+void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 // 与えるダメージを取得
-float AMonsterBase::GetFinalDamage()
+float AEnemyBase::GetFinalDamage()
 {
 	if (AttackComp == nullptr)
 		return 0.f;
@@ -49,7 +49,7 @@ float AMonsterBase::GetFinalDamage()
 	return AttackBaseDamage * CurrentAttackData->DamageMultiplier;
 }
 
-void AMonsterBase::InitializeEnemyHPBarWidget()
+void AEnemyBase::InitializeEnemyHPBarWidget()
 {
 	// プレイヤーコントローラーの取得
 	AMyPlayerController* PC = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());

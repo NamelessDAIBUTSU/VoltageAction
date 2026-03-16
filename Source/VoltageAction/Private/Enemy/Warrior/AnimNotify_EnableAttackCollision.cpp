@@ -1,8 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Monster/Warrior/AnimNotify_EnableAttackCollision.h"
-#include <Monster/Warrior/WarriorMonster.h>
+#include "Enemy/Warrior/AnimNotify_EnableAttackCollision.h"
+#include <Enemy/Warrior/WarriorEnemy.h>
 #include <ActorComponent/WeaponComponent.h>
 
 void UAnimNotify_EnableAttackCollision::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)

@@ -5,7 +5,7 @@
 #include "GameFramework/Character.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include <Monster/MonsterBase.h>
+#include <Enemy/EnemyBase.h>
 #include <Attack/ComboDataAsset.h>
 #include <ActorComponent/EnemyAttackComponent.h>
 
@@ -14,7 +14,7 @@ EBTNodeResult::Type UBTTask_StartComboAttack::ExecuteTask(UBehaviorTreeComponent
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController == nullptr)
 		return EBTNodeResult::Failed;
-	AMonsterBase* Owner = Cast<AMonsterBase>(AIController->GetPawn());
+	AEnemyBase* Owner = Cast<AEnemyBase>(AIController->GetPawn());
 	if (Owner == nullptr)
 		return EBTNodeResult::Failed;
 	USkeletalMeshComponent* Mesh = Owner->GetMesh();

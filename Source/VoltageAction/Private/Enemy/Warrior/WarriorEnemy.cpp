@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Monster/Warrior/WarriorMonster.h"
+#include "Enemy/Warrior/WarriorEnemy.h"
 #include "Components/StaticMeshComponent.h"
 #include <Player/PlayerCharacter.h>
 #include <Components/BoxComponent.h>
@@ -10,21 +10,20 @@
 #include "ActorComponent/WeaponComponent.h"
 #include "ActorComponent/AttackComponent.h"
 
-AWarriorMonster::AWarriorMonster()
-{
-
-}
-
-void AWarriorMonster::OnConstruction(const FTransform& Transform)
+AWarriorEnemy::AWarriorEnemy()
 {
 }
 
-void AWarriorMonster::BeginPlay()
+void AWarriorEnemy::OnConstruction(const FTransform& Transform)
+{
+}
+
+void AWarriorEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AWarriorMonster::Tick(float DeltaTime)
+void AWarriorEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

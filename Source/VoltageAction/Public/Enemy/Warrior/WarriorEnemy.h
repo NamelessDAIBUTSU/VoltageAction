@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Monster/MonsterBase.h"
-#include "WarriorMonster.generated.h"
+#include "Enemy/EnemyBase.h"
+#include "WarriorEnemy.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class VOLTAGEACTION_API AWarriorMonster : public AMonsterBase
+class VOLTAGEACTION_API AWarriorEnemy : public AEnemyBase
 {
 	GENERATED_BODY()
 	
 public:
-	AWarriorMonster();
+	AWarriorEnemy();
 	
 public:
 	virtual void OnConstruction(const FTransform& Transform) override;
