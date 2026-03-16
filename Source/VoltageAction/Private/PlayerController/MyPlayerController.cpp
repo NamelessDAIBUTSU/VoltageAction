@@ -9,10 +9,10 @@
 #include <UI/HUDCanvasWidget.h>
 #include <ActorComponent/HealthComponent.h>
 #include <ActorComponent/CombatComponent.h>
-#include <ActorComponent/AttackComponent.h>
 #include <ActorComponent/ParryComponent.h>
 #include <ActorComponent/WeaponComponent.h>
 #include <Weapon/WeaponActorBase.h>
+#include <ActorComponent/PlayerAttackComponent.h>
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -100,8 +100,8 @@ void AMyPlayerController::LightAttack()
 		return;
 
 	// 攻撃用のコンポーネントを取得
-	UAttackComponent* AttackComp = PlayerCharacter->FindComponentByClass<UAttackComponent>();
-	if (AttackComp == nullptr)
+	UPlayerAttackComponent* PAttackComp = PlayerCharacter->FindComponentByClass<UPlayerAttackComponent>();
+	if (PAttackComp == nullptr)
 		return;
 
 	// 武器コンポーネントから武器の取得
@@ -113,7 +113,7 @@ void AMyPlayerController::LightAttack()
 			UComboDataAsset* LightComboData = Weapon->GetLightComboData();
 
 			// 攻撃を試みる
-			AttackComp->TryAttack(LightComboData);
+			PAttackComp->TryAttack(LightComboData);
 		}
 	}
 }
@@ -126,8 +126,8 @@ void AMyPlayerController::HeavyAttack()
 		return;
 
 	// 攻撃用のコンポーネントを取得
-	UAttackComponent* AttackComp = PlayerCharacter->FindComponentByClass<UAttackComponent>();
-	if (AttackComp == nullptr)
+	UPlayerAttackComponent* PAttackComp = PlayerCharacter->FindComponentByClass<UPlayerAttackComponent>();
+	if (PAttackComp == nullptr)
 		return;
 
 
@@ -140,7 +140,7 @@ void AMyPlayerController::HeavyAttack()
 			UComboDataAsset* HeavyComboData = Weapon->GetHeavyComboData();
 			
 			// 攻撃を試みる
-			AttackComp->TryAttack(HeavyComboData);
+			PAttackComp->TryAttack(HeavyComboData);
 		}
 	}
 }

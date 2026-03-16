@@ -6,7 +6,7 @@
 #include <UI/UIManager.h>
 #include <ActorComponent/HealthComponent.h>
 #include <ActorComponent/CombatComponent.h>
-#include <ActorComponent/AttackComponent.h>
+#include <ActorComponent/EnemyAttackComponent.h>
 #include <ActorComponent/WeaponComponent.h>
 
 AMonsterBase::AMonsterBase()
@@ -14,10 +14,10 @@ AMonsterBase::AMonsterBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 戦闘コンポーネントとHPコンポーネントの作成
-	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
-	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
+	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComp"));
+	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+	AttackComp = CreateDefaultSubobject<UEnemyAttackComponent>(TEXT("EnemyAttackComp"));
+	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComp"));
 }
 
 void AMonsterBase::BeginPlay()

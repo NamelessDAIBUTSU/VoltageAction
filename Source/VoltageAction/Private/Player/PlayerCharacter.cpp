@@ -10,7 +10,7 @@
 #include "ActorComponent/CombatComponent.h"
 #include "ActorComponent/HealthComponent.h"
 #include "ActorComponent/WeaponComponent.h"
-#include "ActorComponent/AttackComponent.h"
+#include "ActorComponent/PlayerAttackComponent.h"
 #include "ActorComponent/ParryComponent.h"
 #include <Voltage/VoltageManager.h>
 #include <Attack/ComboDataAsset.h>
@@ -31,22 +31,22 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 	// Create a camera boom...
-	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoomComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->bUsePawnControlRotation = true;
 
 	// Create a camera...
-	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
 	CameraComp->bUsePawnControlRotation = false;
 
 	// コンポーネントの作成
-	DodgeComp = CreateDefaultSubobject<UDodgeComponent>(TEXT("Dodge"));
-	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat"));
-	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("Attack"));
-	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
-	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("Weapon"));
-	ParryComp = CreateDefaultSubobject<UParryComponent>(TEXT("Parry"));
+	DodgeComp = CreateDefaultSubobject<UDodgeComponent>(TEXT("DodgeComp"));
+	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComp"));
+	AttackComp = CreateDefaultSubobject<UPlayerAttackComponent>(TEXT("AttackComp"));
+	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComp"));
+	ParryComp = CreateDefaultSubobject<UParryComponent>(TEXT("ParryComp"));
 }
 
 // Called when the game starts or when spawned
@@ -79,29 +79,6 @@ void APlayerCharacter::BeginPlay()
 			//HPComp->OnDeathDelegate.AddUObject(, &::);
 		}
 	}
-
-	//// 武器の生成
-	//if (WeaponActorClass)
-	//{
-	//	if (WeaponComp)
-	//	{
-	//		FActorSpawnParameters SpawnParams;
-	//		SpawnParams.Owner = this;
-	//		AWeaponActorBase* SpawnedWeapon = GetWorld()->SpawnActor<AWeaponActorBase>(WeaponActorClass, SpawnParams);
-	//		if (SpawnedWeapon)
-	//		{
-	//			WeaponComp->SetWeapon(SpawnedWeapon);
-	//		}
-
-	//		// 武器をソケットに装着
-	//		USkeletalMeshComponent* MeshComp = GetMesh();
-	//		if (MeshComp && SpawnedWeapon)
-	//		{
-	//			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
-	//			SpawnedWeapon->AttachToComponent(MeshComp, AttachRules, SpawnedWeapon->GetAttachSocketName());
-	//		}
-	//	}
-	//}
 }
 
 // Called every frame

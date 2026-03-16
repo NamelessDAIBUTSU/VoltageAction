@@ -34,27 +34,27 @@ public:
 	// 現在の攻撃データを取得
 	class UAttackDataAsset* GetCurrentAttackData() const;
 
-public: /* プレイヤー用 */
-	// 攻撃アクション発生時
-	void TryAttack(UComboDataAsset* NextComboData);
-
-	// 攻撃イベント実行
-	void ExecAttack(EAttackResult AttackResult, const FAttackData& AttackData);
-
-	// 攻撃アニメーションモンタージュ終了時のコールバック
-	UFUNCTION()
-	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-
 	// 現在コンボの最終攻撃か
 	bool IsFinalAttackInCurrentCombo();
 
+	// 次回攻撃がコンボ攻撃の初撃か
+	bool CheckIsNextAttackFirst(UComboDataAsset* NextComboData);
+
+protected:
+	// 次の攻撃のために情報を設定
+	void SetupNextAttack(UComboDataAsset* NextComboData);
+
 private:
+	// 攻撃イベント実行
+	void ExecAttack(EAttackResult AttackResult, const FAttackData& AttackData);
+
+protected:
 	// 現在のコンボデータ
 	UPROPERTY(VisibleAnywhere)
 	TWeakObjectPtr<UComboDataAsset> CurrentComboData = nullptr;
 
-	// 現在のコンボインデックス
-	int32 CurrentComboIndex = INDEX_NONE;
+	// 現在の攻撃データインデックス
+	int32 CurrentAttackIndexInCombo = INDEX_NONE;
 
 	// 攻撃モンタージュ終了時のデリゲート
 	FOnMontageEnded OnMontageEndDelegate;

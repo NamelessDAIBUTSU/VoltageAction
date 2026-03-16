@@ -10,9 +10,6 @@
 #include "Interface/Interface_DamageGetter.h"
 #include "PlayerCharacter.generated.h"
 
-class APlayerGhost;
-class UGhostManagerComponent;
-
 UCLASS()
 class VOLTAGEACTION_API APlayerCharacter : public ACharacter, public IDamageGetter
 {
@@ -82,7 +79,7 @@ private: /* コンポーネント */
 
 	// 攻撃
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAttackComponent> AttackComp;
+	TObjectPtr<class UPlayerAttackComponent> AttackComp;
 
 	// パリィ
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

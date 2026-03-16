@@ -32,6 +32,15 @@ enum class EMoveType : uint8
 	Turret UMETA(DisplayName = "Turret"),
 };
 
+// 敵のステート
+UENUM()
+enum class EEnemyState
+{
+	Idle		UMETA(DisplayName = "通常"),
+	Attack		UMETA(DisplayName = "攻撃"),
+	Hit			UMETA(DisplayName = "ヒット"),
+	Dead		UMETA(DisplayName = "死亡"),
+};
 
 UCLASS()
 class VOLTAGEACTION_API UMonsterData : public UDataAsset
