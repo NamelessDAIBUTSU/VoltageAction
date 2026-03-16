@@ -8,6 +8,7 @@
 #include <ActorComponent/CombatComponent.h>
 #include <ActorComponent/EnemyAttackComponent.h>
 #include <ActorComponent/WeaponComponent.h>
+#include "Attack/AttackDataAsset.h"
 
 AMonsterBase::AMonsterBase()
 {
@@ -40,10 +41,12 @@ float AMonsterBase::GetFinalDamage()
 	if (AttackComp == nullptr)
 		return 0.f;
 
+	UAttackDataAsset* CurrentAttackData = AttackComp->GetCurrentAttackData();
+	if (CurrentAttackData == nullptr)
+		return 0.f;
+
 	// 敵のベースダメージ × 現在の攻撃データの割合
-
-
-	return 0.f;
+	return AttackBaseDamage * CurrentAttackData->DamageMultiplier;
 }
 
 void AMonsterBase::InitializeEnemyHPBarWidget()

@@ -19,7 +19,7 @@ public:
 
 	// コンボ攻撃終了時にSucceededを返すためのコールバック
 	UFUNCTION()
-	void OnComboAttackEnd(UAnimMontage* Montage, bool bInterrupted);
+	void OnComboAttackEnd();
 
 private:
 	UPROPERTY()

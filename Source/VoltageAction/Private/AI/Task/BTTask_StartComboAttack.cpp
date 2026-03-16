@@ -33,7 +33,7 @@ EBTNodeResult::Type UBTTask_StartComboAttack::ExecuteTask(UBehaviorTreeComponent
 		EAttackComp->StartComboAttack(ComboDataIndex);
 
 		// コンボ攻撃終了時にタスクを完了させるイベントをバインド
-		EAttackComp->OnComboAttackEndDelegate.BindUObject(this, &ThisClass::OnComboAttackEnd);
+		EAttackComp->OnComboAttackEndDelegate.AddUObject(this, &ThisClass::OnComboAttackEnd);
 	}
 
 	CachedBTComp = &OwnerComp;
@@ -42,7 +42,7 @@ EBTNodeResult::Type UBTTask_StartComboAttack::ExecuteTask(UBehaviorTreeComponent
 }
 
 // コンボ攻撃終了時にSucceededを返すためのイベント
-void UBTTask_StartComboAttack::OnComboAttackEnd(UAnimMontage* Montage, bool bInterrupted)
+void UBTTask_StartComboAttack::OnComboAttackEnd()
 {
 	if (CachedBTComp.IsValid())
 	{

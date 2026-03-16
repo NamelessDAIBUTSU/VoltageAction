@@ -19,7 +19,7 @@ void UEnemyAttackComponent::BeginPlay()
 	// 攻撃終了時のイベントをバインド
 	OnMontageEndDelegate.BindUObject(this, &UEnemyAttackComponent::OnAttackMontageEnded);
 	// コンボ攻撃終了時のイベントをバインド
-	OnComboAttackEndDelegate.BindUObject(this, &UEnemyAttackComponent::OnFinalAttackMontageEnd);
+	OnFinalAttackEndDelegate.BindUObject(this, &UEnemyAttackComponent::OnFinalAttackMontageEnd);
 }
 
 // コンボ攻撃の開始
@@ -68,13 +68,15 @@ void UEnemyAttackComponent::TryAttack(UComboDataAsset* NextComboData)
 		// イベント関連
 		if (UAnimInstance* AnimInstance = Enemy->GetMesh()->GetAnimInstance())
 		{
-			// モンタージュ終了時のイベントをバインド
-			AnimInstance->Montage_SetEndDelegate(OnMontageEndDelegate, AttackMontage);
-
 			// コンボ内の最終攻撃の場合、最終攻撃終了時のイベントをバインド
 			if (IsFinalAttackInCurrentCombo())
 			{
-				AnimInstance->Montage_SetEndDelegate(OnComboAttackEndDelegate, AttackMontage);
+				AnimInstance->Montage_SetEndDelegate(OnFinalAttackEndDelegate, AttackMontage);
+			}
+			// モンタージュ終了時のイベントをバインド
+			else
+			{
+				AnimInstance->Montage_SetEndDelegate(OnMontageEndDelegate, AttackMontage);
 			}
 		}
 	}
@@ -105,4 +107,8 @@ void UEnemyAttackComponent::OnFinalAttackMontageEnd(UAnimMontage* Montage, bool 
 {
 	// コンボ情報をリセット
 	CurrentAttackIndexInCombo = INDEX_NONE;
+
+	// 最終攻撃終了時に呼びたいイベントを発火
+	// #MEMO : 現状、BTにタスク終了を返す
+	OnComboAttackEndDelegate.Broadcast();
 }

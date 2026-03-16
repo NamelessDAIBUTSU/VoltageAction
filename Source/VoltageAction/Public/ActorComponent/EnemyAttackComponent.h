@@ -42,7 +42,8 @@ private:
 
 public:
 	// コンボ攻撃終了時デリゲート
-	FOnMontageEnded OnComboAttackEndDelegate;
+	FOnMontageEnded OnFinalAttackEndDelegate;
+	FOnComboAttackEndDelegate OnComboAttackEndDelegate;
 
 private:
 	// 所有するコンボデータリスト
