@@ -42,23 +42,26 @@ public: /* プレイヤー状態 */
 	EPlayerState GetPlayerState() const { return PlayerState; }
 
 	// 攻撃可能状態か
-	bool CanAttackState() { return PlayerState == EPlayerState::Idle || PlayerState == EPlayerState::Attacked; }
+	bool CanAttackState() { return PlayerState == EPlayerState::Idle || PlayerState == EPlayerState::PostAttack; }
 	// パリィ可能状態か
-	bool CanParryState() { return PlayerState == EPlayerState::Idle || PlayerState == EPlayerState::Parried; }
+	bool CanParryState() { return PlayerState == EPlayerState::Idle || PlayerState == EPlayerState::PostParry; }
 	// 回避可能状態か
-	bool CanDodgeState() { return PlayerState == EPlayerState::Idle || PlayerState == EPlayerState::Attacked || PlayerState == EPlayerState::Parried; }
+	bool CanDodgeState() { return PlayerState == EPlayerState::Idle || PlayerState == EPlayerState::PostAttack || PlayerState == EPlayerState::PostParry; }
 
 	// 攻撃状態か
-	bool IsAttackState() {return PlayerState == EPlayerState::Attack || PlayerState == EPlayerState::Attacked;}
+	bool IsAttackState() {return PlayerState == EPlayerState::Attack || PlayerState == EPlayerState::PostAttack;}
 	// パリィ状態か
-	bool IsParryState() {return PlayerState == EPlayerState::Parry || PlayerState == EPlayerState::Parried;}
+	bool IsParryState() {return PlayerState == EPlayerState::PreParry || PlayerState == EPlayerState::Parring || PlayerState == EPlayerState::Parry_End || PlayerState == EPlayerState::PostParry;}
 
-public: /* カメラ */
-	// マウスによるカメラ回転スピード
-	UPROPERTY(EditAnywhere)
-	float CameraXRotateSpeed = 0.1f;
-	UPROPERTY(EditAnywhere)
-	float CameraYRotateSpeed = 0.1f;
+private:
+	// イベントのバインド
+	void BindEvents();
+
+	// 各種アニメーション再生
+	UFUNCTION()
+	void OnPlayHitAnim();
+	UFUNCTION()
+	void OnPlayDieAnim();
 
 private: /* コンポーネント */
 	// カメラ
@@ -93,7 +96,21 @@ private: /* コンポーネント */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UWeaponComponent> WeaponComp;
 
+private: /* アニメーション */
+	// ヒット
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> HitReactMontage;
+	// 死亡
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> DieMontage;
+
 private:
 	// 現在の状態
 	EPlayerState PlayerState = EPlayerState::Idle;
+
+	// マウスによるカメラ回転スピード
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float CameraXRotateSpeed = 0.1f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float CameraYRotateSpeed = 0.1f;
 };

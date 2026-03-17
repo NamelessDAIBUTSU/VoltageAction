@@ -117,6 +117,14 @@ void UVoltageManager::OnTakeDamage()
         ChangeVoltage(VoltageParamTable->TakeDamageLostVoltage);
     }
 }
+// パリィ成功によるボルテージ増加
+void UVoltageManager::OnParrySuccess()
+{
+    if (VoltageParamTable)
+    {
+        ChangeVoltage(VoltageParamTable->ParrySuccessGainVoltage);
+    }
+}
 
 // 最高ランクの維持状態の処理
 bool UVoltageManager::UpdateMaxRankMaintain(float DeltaTime)

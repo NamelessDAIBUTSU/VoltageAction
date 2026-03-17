@@ -35,8 +35,8 @@ void UParryComponent::TryParry()
 	{
 		Owner->PlayAnimMontage(ParryMontage);
 
-		// プレイヤー状態をパリィに設定
-		Owner->SetPlayerState(EPlayerState::Parry);
+		// プレイヤー状態をパリィ前に設定
+		Owner->SetPlayerState(EPlayerState::PreParry);
 
 		// モンタージュ終了時のイベントを設定
 		if (UAnimInstance* AnimInstance = Owner->GetMesh()->GetAnimInstance())
@@ -49,6 +49,8 @@ void UParryComponent::TryParry()
 // パリィ成功時の処理
 void UParryComponent::OnParrySuccess()
 {
+	// イベントの発火
+	OnParrySuccessDelegate.Broadcast();
 }
 
 // パリィ終了時のイベント

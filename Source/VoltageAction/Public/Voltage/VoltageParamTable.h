@@ -38,6 +38,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Voltage")
 	float JustDodgeGainVoltage;
 
+	// パリィ成功によるボルテージ増加量
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Voltage")
+	float ParrySuccessGainVoltage = 10.f;
+
 	// ボルテージランク毎のパラメータ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Voltage")
 	TMap<EVoltageRank, FVoltageRankParam> VoltageRankParams;

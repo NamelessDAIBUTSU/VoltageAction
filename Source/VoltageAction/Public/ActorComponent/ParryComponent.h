@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "ParryComponent.generated.h"
 
+// パリィ成功デリゲート
+DECLARE_MULTICAST_DELEGATE(FOnParrySuccessDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VOLTAGEACTION_API UParryComponent : public UActorComponent
@@ -31,6 +33,10 @@ private:
 	// パリィ終了時のイベント
 	UFUNCTION()
 	void OnParryMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+public:
+	// パリィ成功時のデリゲート
+	FOnParrySuccessDelegate OnParrySuccessDelegate;
 
 private:
 	// パリィモンタージュ

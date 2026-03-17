@@ -26,9 +26,14 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->bConstrainToPlane = true;
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	if (UCharacterMovementComponent* CharaMoveComp = GetCharacterMovement())
+	{
+		CharaMoveComp->bOrientRotationToMovement = true;
+		CharaMoveComp->bConstrainToPlane = true;
+		CharaMoveComp->bSnapToPlaneAtStart = true;
+
+		CharaMoveComp->RotationRate.Yaw = 1800.f;
+	}
 
 	// Create a camera boom...
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoomComp"));
@@ -55,30 +60,7 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// イベントのバインド
-	if (UVoltageManager* VoltageManager = GetWorld()->GetSubsystem<UVoltageManager>())
-	{
-		// ジャスト回避
-		if (DodgeComp)
-		{
-			// ボルテージ増加
-			DodgeComp->OnJustDodgeDelegate.AddUObject(VoltageManager, &UVoltageManager::OnJustDodge);
-
-			// 無敵状態の開始
-			if (CombatComp)
-			{
-				DodgeComp->OnJustDodgeDelegate.AddUObject(CombatComp, &UCombatComponent::OnStartInvincible);
-			}
-		}
-
-		if (HPComp)
-		{
-			// 被ダメージ
-			HPComp->OnDamagedDelegate.AddUObject(VoltageManager, &UVoltageManager::OnTakeDamage);
-
-			// 死亡
-			//HPComp->OnDeathDelegate.AddUObject(, &::);
-		}
-	}
+	BindEvents();
 }
 
 // Called every frame
@@ -159,4 +141,74 @@ void APlayerCharacter::RotateCamera(const FInputActionValue& Value)
 void APlayerCharacter::SetPlayerState(EPlayerState State)
 {
 	PlayerState = State;
+}
+
+// イベントのバインド
+void APlayerCharacter::BindEvents()
+{
+	if (UVoltageManager* VoltageManager = GetWorld()->GetSubsystem<UVoltageManager>())
+	{
+		// ジャスト回避
+		if (DodgeComp)
+		{
+			// ボルテージ増加
+			DodgeComp->OnJustDodgeDelegate.AddUObject(VoltageManager, &UVoltageManager::OnJustDodge);
+
+			// 無敵状態の開始
+			if (CombatComp)
+			{
+				DodgeComp->OnJustDodgeDelegate.AddUObject(CombatComp, &UCombatComponent::OnStartInvincible);
+			}
+		}
+
+		// 体力関連
+		if (HPComp)
+		{
+			// 被ダメージ：ボルテージ増加、アニメーション再生
+			HPComp->OnDamagedDelegate.AddUObject(VoltageManager, &UVoltageManager::OnTakeDamage);
+			HPComp->OnDamagedDelegate.AddUObject(this, &ThisClass::OnPlayHitAnim);
+
+			// 死亡：アニメーション再生
+			HPComp->OnDieDelegate.AddUObject(this, &ThisClass::OnPlayDieAnim);
+		}
+
+		// パリィ成功
+		if (ParryComp)
+		{
+			ParryComp->OnParrySuccessDelegate.AddUObject(VoltageManager, &UVoltageManager::OnParrySuccess);
+		}
+	}
+}
+
+// 各種アニメーション再生
+void APlayerCharacter::OnPlayHitAnim()
+{
+	if (HitReactMontage)
+	{
+		// 再生
+		PlayAnimMontage(HitReactMontage);
+
+		// ステートをHitに変更
+		PlayerState = EPlayerState::Hit;
+
+		// アニメーション終了時にIdleに戻す
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		{
+			FOnMontageEnded OnMontageEndDelegate;
+			OnMontageEndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted)
+				{
+					PlayerState = EPlayerState::Idle;
+				});
+			AnimInstance->Montage_SetEndDelegate(OnMontageEndDelegate, HitReactMontage);
+		}
+	}
+}
+void APlayerCharacter::OnPlayDieAnim()
+{
+	if (DieMontage)
+	{
+		PlayAnimMontage(DieMontage);
+
+		PlayerState = EPlayerState::Dead;
+	}
 }

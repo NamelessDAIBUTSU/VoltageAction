@@ -92,7 +92,7 @@ void UPlayerAttackComponent::TryAttack(UComboDataAsset* NextComboData)
 		// 攻撃モンタージュ再生
 		PlayerCharacter->PlayAnimMontage(AttackMontage);
 
-		// 攻撃ステートに移行
+		// 攻撃前ステートに移行
 		PlayerCharacter->SetPlayerState(EPlayerState::Attack);
 
 		// モンタージュ終了時のイベントを設定

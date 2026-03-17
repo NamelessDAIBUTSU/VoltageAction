@@ -61,7 +61,7 @@ EAttackResult UCombatComponent::ReceiveAttack(const FAttackData& AttackData)
 		}
 
 		// パリィ
-		if (PlayerCharacter->GetPlayerState() == EPlayerState::Parry)
+		if (PlayerCharacter->GetPlayerState() == EPlayerState::Parring)
 		{
 			if (UParryComponent* ParryComp = DamagedOwner->FindComponentByClass<UParryComponent>())
 			{

@@ -59,6 +59,8 @@ public: /* コールバック */
 	void OnJustDodge();
 	// 被ダメージによるボルテージ減少
 	void OnTakeDamage();
+	// パリィ成功によるボルテージ増加
+	void OnParrySuccess();
 
 private:
 	// 最高ランクの維持状態の処理
