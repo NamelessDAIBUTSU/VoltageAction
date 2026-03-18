@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Interface/Weighted.h"
 #include <Player/PlayerDef.h>
+#include <Attack/AttackDef.h>
 #include "Interface/Interface_DamageGetter.h"
 #include "PlayerCharacter.generated.h"
 
@@ -29,6 +30,10 @@ public:
 public: /* IDamageGetter */
 	// 与えるダメージを取得
 	virtual float GetFinalDamage() override;
+	// 与える耐久値ダメージを取得
+	virtual float GetFinalPoiseDamage() override;
+	// 与えるブレイク値ダメージを取得
+	virtual float GetFinalBreakDamage() override;
 
 public: /* 入力によるアクション */
 	// 移動
@@ -59,9 +64,9 @@ private:
 
 	// 各種アニメーション再生
 	UFUNCTION()
-	void OnPlayHitAnim();
+	void OnPlayHitAnim(const FAttackData& AttackData);
 	UFUNCTION()
-	void OnPlayDieAnim();
+	void OnDie();
 
 private: /* コンポーネント */
 	// カメラ

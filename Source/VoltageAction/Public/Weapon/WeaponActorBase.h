@@ -31,6 +31,9 @@ public:
 
 	// 基礎攻撃力の取得
 	float GetBaseDamage() const { return BaseDamage; }
+	float GetBasePoiseDamage() const { return BasePoiseDamage; }
+	float GetBaseBreakDamage() const { return BaseBreakDamage; }
+
 	// 弱攻撃コンボデータの取得
 	UComboDataAsset* GetLightComboData() const { return LightComboData; }
 	// 強攻撃コンボデータの取得
@@ -56,6 +59,14 @@ private:
 	// 基礎攻撃力
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	float BaseDamage = 10.f;
+
+	// 基礎耐久値ダメージ
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float BasePoiseDamage = 10.f;
+
+	// 基礎ブレイクダメージ
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float BaseBreakDamage = 10.f;
 
 	// 攻撃用コリジョン
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))

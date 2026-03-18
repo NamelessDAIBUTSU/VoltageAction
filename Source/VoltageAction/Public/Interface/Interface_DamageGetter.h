@@ -18,5 +18,10 @@ class VOLTAGEACTION_API IDamageGetter
 	GENERATED_BODY()
 
 public:
+	// 与えるダメージを取得
 	virtual float GetFinalDamage() = 0;
+	// 与える耐久値ダメージを取得
+	virtual float GetFinalPoiseDamage() { return 0.f; };
+	// 与えるブレイク値ダメージを取得
+	virtual float GetFinalBreakDamage() { return 0.f; };
 };

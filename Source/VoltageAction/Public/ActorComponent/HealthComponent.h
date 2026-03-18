@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "UI/PlayerHPBarWidget.h"
+#include "../Attack/AttackDef.h"
 #include "HealthComponent.generated.h"
 
 struct FGaugeUpdateData;
@@ -12,7 +13,7 @@ struct FGaugeUpdateData;
 // HP更新デリゲート
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPDelegate, const FGaugeUpdateData&);
 // 被ダメージデリゲート
-DECLARE_MULTICAST_DELEGATE(FOnDamagedDelegate);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDamagedDelegate, const FAttackData&);
 // 死亡デリゲート
 DECLARE_MULTICAST_DELEGATE(FOnDieDelegate);
 

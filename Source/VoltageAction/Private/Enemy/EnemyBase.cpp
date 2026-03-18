@@ -8,17 +8,21 @@
 #include <ActorComponent/CombatComponent.h>
 #include <ActorComponent/EnemyAttackComponent.h>
 #include <ActorComponent/WeaponComponent.h>
+#include <ActorComponent/StaggerComponent.h>
 #include "Attack/AttackDataAsset.h"
+#include <BehaviorTree/BlackboardComponent.h>
+#include "AIController.h"
 
 AEnemyBase::AEnemyBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 戦闘コンポーネントとHPコンポーネントの作成
+	// コンポーネントの生成
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComp"));
 	HPComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 	AttackComp = CreateDefaultSubobject<UEnemyAttackComponent>(TEXT("EnemyAttackComp"));
 	WeaponComp = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComp"));
+	StaggerComp = CreateDefaultSubobject<UStaggerComponent>(TEXT("StaggerComp"));
 }
 
 void AEnemyBase::BeginPlay()
@@ -27,12 +31,42 @@ void AEnemyBase::BeginPlay()
 	
 	// 生成後、敵HPバーウィジェットの初期化をする
 	InitializeEnemyHPBarWidget();
+
+	// イベントのバインド
+	BindEvents();
 }
 
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AEnemyBase::BindEvents()
+{
+	if (HPComp && StaggerComp)
+	{
+		// よろめきダメージイベント
+		HPComp->OnDamagedDelegate.AddUObject(StaggerComp, &UStaggerComponent::OnTakeStaggerDamage);
+
+		StaggerComp->OnStaggerDelegate.AddUObject(this, &ThisClass::OnSetStaggerType);
+	}
+}
+
+// BehaviorTreeの停止
+void AEnemyBase::OnSetStaggerType(EStaggerType Type)
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController == nullptr)
+		return;
+
+	// BlackBoardを取得
+	UBlackboardComponent* BBComp = AIController->GetBlackboardComponent();
+	if (BBComp == nullptr)
+		return;
+
+	// BT停止用のフラグを立てる
+	BBComp->SetValueAsEnum("StaggerType", static_cast<uint8>(Type));
 }
 
 // 与えるダメージを取得
@@ -62,5 +96,3 @@ void AEnemyBase::InitializeEnemyHPBarWidget()
 		UIManager->InitializeEnemyHPBarWidget(HPComp);
 	}
 }
-
-

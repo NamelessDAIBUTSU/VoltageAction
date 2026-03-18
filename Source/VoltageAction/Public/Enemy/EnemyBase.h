@@ -35,6 +35,13 @@ public:
 	EEnemyState GetEnemyState() const { return EnemyState; }
 
 private:
+	// イベントのバインド
+	void BindEvents();
+
+	// よろけタイプの設定
+	UFUNCTION()
+	void OnSetStaggerType(EStaggerType Type);
+
 	// 敵HPバーウィジェットの初期化
 	void InitializeEnemyHPBarWidget();
 
@@ -54,6 +61,10 @@ protected: /* コンポーネント */
 	// 装備コンポーネント
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UWeaponComponent> WeaponComp;
+
+	// よろめきコンポーネント
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UStaggerComponent> StaggerComp;
 
 protected:
 	// 敵の現在のステート

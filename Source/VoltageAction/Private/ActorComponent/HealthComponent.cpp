@@ -4,7 +4,8 @@
 #include "ActorComponent/HealthComponent.h"
 #include "GameFramework/Character.h"
 #include "UI/VoltageGaugeWidget.h"
-
+#include <ActorComponent/WeaponComponent.h>
+#include <Interface/Interface_DamageGetter.h>
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
 {
@@ -55,7 +56,20 @@ void UHealthComponent::TakeAnyDamage(
 	CurrentHP = FMath::Clamp(CurrentHP - Damage, 0.f, CurrentHP);
 
 	// 被ダメージ時デリゲートの発火（原因イベント）
-	OnDamagedDelegate.Broadcast();
+	{
+		FAttackData AttackData;
+		AttackData.DamagedActor = DamagedActor;
+		AttackData.AttackerActor = DamageCauser;
+		AttackData.Damage = Damage;
+		if (IDamageGetter* DamageGetter = Cast<IDamageGetter>(DamageCauser))
+		{
+			AttackData.PoiseDamage = DamageGetter->GetFinalPoiseDamage();
+			AttackData.BreakDamage = DamageGetter->GetFinalBreakDamage();
+		}
+	
+		// 発火
+		OnDamagedDelegate.Broadcast(AttackData);
+	}
 
 	// HP更新デリゲートの発火（結果イベント）
 	FGaugeUpdateData UpdateData(CurrentHP, MaxHP, 0.f);

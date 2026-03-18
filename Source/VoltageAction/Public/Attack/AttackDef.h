@@ -10,7 +10,16 @@ struct FAttackData
 	GENERATED_BODY()
 
 public:
+	// 最終ダメージ
 	float Damage = 0.f;
+	// 最終耐久値ダメージ
+	float PoiseDamage = 0.f;
+	// 最終ブレイクダメージ
+	float BreakDamage = 0.f;
+
+	// 攻撃したアクター
+	UPROPERTY()
+	TWeakObjectPtr<AActor> AttackerActor = nullptr;
 	// 攻撃されたアクター
 	UPROPERTY()
 	TWeakObjectPtr<AActor> DamagedActor = nullptr;
@@ -26,3 +35,4 @@ enum class EAttackResult : uint8
 	JustDodge	UMETA(DisplayName = "ジャスト回避"),
 	None		UMETA(DisplayName = "エラー値")
 };
+

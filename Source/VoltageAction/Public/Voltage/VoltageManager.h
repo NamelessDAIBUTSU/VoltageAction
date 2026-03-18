@@ -7,6 +7,7 @@
 #include "VoltageDef.h"
 #include "UI/VoltageGaugeWidget.h"
 #include "VoltageParamTable.h"
+#include <Attack/AttackDef.h>
 #include "VoltageManager.generated.h"
 
 struct FGaugeUpdateData;
@@ -58,7 +59,7 @@ public: /* コールバック */
 	// ジャスト回避によるボルテージ増加
 	void OnJustDodge();
 	// 被ダメージによるボルテージ減少
-	void OnTakeDamage();
+	void OnTakeDamage(const FAttackData& AttackData);
 	// パリィ成功によるボルテージ増加
 	void OnParrySuccess();
 

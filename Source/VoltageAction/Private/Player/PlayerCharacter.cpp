@@ -82,12 +82,46 @@ float APlayerCharacter::GetFinalDamage()
 	if (WeaponComp == nullptr || AttackComp == nullptr)
 		return 0.f;
 
-	// 武器のベースダメージ × 現在の攻撃データの割合
+	// 武器のベースダメージ × 現在の攻撃データの補正割合
 	if (AWeaponActorBase* Weapon = WeaponComp->GetWeapon())
 	{
 		if (UAttackDataAsset* CurrentAttackData = AttackComp->GetCurrentAttackData())
 		{
 			return Weapon->GetBaseDamage() * CurrentAttackData->DamageMultiplier;
+		}
+	}
+
+	return 0.f;
+}
+
+float APlayerCharacter::GetFinalPoiseDamage()
+{
+	if (WeaponComp == nullptr || AttackComp == nullptr)
+		return 0.f;
+
+	// 武器のベース耐久値ダメージ × 現在の攻撃データの補正割合
+	if (AWeaponActorBase* Weapon = WeaponComp->GetWeapon())
+	{
+		if (UAttackDataAsset* CurrentAttackData = AttackComp->GetCurrentAttackData())
+		{
+			return Weapon->GetBasePoiseDamage() * CurrentAttackData->PoiseDamageMultiplier;
+		}
+	}
+
+	return 0.f;
+}
+
+float APlayerCharacter::GetFinalBreakDamage()
+{
+	if (WeaponComp == nullptr || AttackComp == nullptr)
+		return 0.f;
+
+	// 武器のベースブレイクダメージ × 現在の攻撃データの補正割合
+	if (AWeaponActorBase* Weapon = WeaponComp->GetWeapon())
+	{
+		if (UAttackDataAsset* CurrentAttackData = AttackComp->GetCurrentAttackData())
+		{
+			return Weapon->GetBaseBreakDamage() * CurrentAttackData->BreakDamageMultiplier;
 		}
 	}
 
@@ -148,40 +182,37 @@ void APlayerCharacter::BindEvents()
 {
 	if (UVoltageManager* VoltageManager = GetWorld()->GetSubsystem<UVoltageManager>())
 	{
-		// ジャスト回避
 		if (DodgeComp)
 		{
-			// ボルテージ増加
+			// ジャスト回避成功：ボルテージ増加
 			DodgeComp->OnJustDodgeDelegate.AddUObject(VoltageManager, &UVoltageManager::OnJustDodge);
-
-			// 無敵状態の開始
+			// ジャスト回避成功：無敵状態の開始
 			if (CombatComp)
 			{
 				DodgeComp->OnJustDodgeDelegate.AddUObject(CombatComp, &UCombatComponent::OnStartInvincible);
 			}
 		}
 
-		// 体力関連
 		if (HPComp)
 		{
 			// 被ダメージ：ボルテージ増加、アニメーション再生
 			HPComp->OnDamagedDelegate.AddUObject(VoltageManager, &UVoltageManager::OnTakeDamage);
 			HPComp->OnDamagedDelegate.AddUObject(this, &ThisClass::OnPlayHitAnim);
 
-			// 死亡：アニメーション再生
-			HPComp->OnDieDelegate.AddUObject(this, &ThisClass::OnPlayDieAnim);
+			// 死亡
+			HPComp->OnDieDelegate.AddUObject(this, &ThisClass::OnDie);
 		}
 
-		// パリィ成功
 		if (ParryComp)
 		{
+			// パリィ成功
 			ParryComp->OnParrySuccessDelegate.AddUObject(VoltageManager, &UVoltageManager::OnParrySuccess);
 		}
 	}
 }
 
 // 各種アニメーション再生
-void APlayerCharacter::OnPlayHitAnim()
+void APlayerCharacter::OnPlayHitAnim(const FAttackData& AttackData)
 {
 	if (HitReactMontage)
 	{
@@ -203,8 +234,12 @@ void APlayerCharacter::OnPlayHitAnim()
 		}
 	}
 }
-void APlayerCharacter::OnPlayDieAnim()
+void APlayerCharacter::OnDie()
 {
+	// ステートを変更
+	PlayerState = EPlayerState::Dead;
+
+	// モンタージュ再生
 	if (DieMontage)
 	{
 		PlayAnimMontage(DieMontage);

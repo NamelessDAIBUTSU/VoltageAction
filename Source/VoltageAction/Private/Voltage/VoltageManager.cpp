@@ -110,7 +110,7 @@ void UVoltageManager::OnJustDodge()
     }
 }
 // 被ダメージによるボルテージ減少通知
-void UVoltageManager::OnTakeDamage()
+void UVoltageManager::OnTakeDamage(const FAttackData& AttackData)
 {
     if (VoltageParamTable)
     {

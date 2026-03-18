@@ -7,7 +7,7 @@
 #include "AttackDataAsset.generated.h"
 
 /// <summary>
-/// 1ヒットの攻撃に関するデータアセット
+/// 1アニメーションの攻撃に関するデータアセット
 /// </summary>
 UCLASS()
 class VOLTAGEACTION_API UAttackDataAsset : public UDataAsset
@@ -19,15 +19,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Common")
 	TObjectPtr<UAnimMontage> AttackMontage = nullptr;
 
-	// 武器の基礎ダメージへの倍率
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Common")
-	float DamageMultiplier = 1.f;
-
 	// パリィ可能な攻撃か
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	bool bCanParry = false;
 
-	// ヒットすることで獲得できるボルテージ量
+	// 獲得できるボルテージ量
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
 	float GainVoltage = 0.f;
+
+	// 武器の基礎ダメージへの倍率
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Common")
+	float DamageMultiplier = 1.f;
+
+	// 基礎耐久値ダメージへの倍率
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+	float PoiseDamageMultiplier = 1.f;
+
+	// 基礎ブレイクダメージへの倍率
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+	float BreakDamageMultiplier = 1.f;
 };
